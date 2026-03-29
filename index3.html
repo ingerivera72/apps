@@ -18,10 +18,11 @@
         }
 
         /* Temas */
-        body.theme-green { background-color: #064e3b; color: #ecfdf5; } /* Verde FES */
-        body.theme-dark { background-color: #020617; color: #f1f5f9; }
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
+        body.theme-dark { background-color: #020617; color: #f1f5f9; }
+        body.theme-green { background-color: #064e3b; color: #ecfdf5; }
         body.theme-blue { background-color: #bae6fd; color: #0369a1; }
+        body.theme-pink { background-color: #fce7f3; color: #9d174d; }
 
         .app-container {
             height: 100dvh;
@@ -32,19 +33,20 @@
         }
 
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
-        .section-display { height: 18%; display: flex; flex-direction: column; justify-content: center; }
-        .section-keypad  { height: 60%; display: flex; flex-direction: column; }
+        /* Reducción de altura en la sección de display */
+        .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
+        .section-keypad  { height: 63%; display: flex; flex-direction: column; }
         .section-footer  { height: 12%; display: flex; align-items: center; gap: 12px; }
 
         .glass-panel {
-            background: rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(128, 128, 128, 0.1);
             border-radius: 12px;
             padding: 4px 8px;
         }
 
-        .theme-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
-        .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
+        .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
 
         .band-btn {
             flex: 1; padding: 4px 0; font-size: 11px; font-weight: 900; border-radius: 8px;
@@ -58,11 +60,14 @@
             column-gap: 6px; 
             row-gap: 3px;
             flex-grow: 1;
+            /* Reducción del 50% en la separación superior respecto a los labels */
+            margin-top: 2px; 
         }
 
         .color-card {
-            height: calc(100% - 2px); /* Reducción de 2px solicitada */
-            min-height: 22px;
+            /* Reducción de 2px adicionales en vertical */
+            height: calc(100% - 4px); 
+            min-height: 20px;
             border-radius: 4px;
             display: flex;
             align-items: center;
@@ -73,9 +78,8 @@
             position: relative;
         }
         
-        /* Resalte de selección más agresivo */
         .color-card.selected {
-            border: 3px solid #ffffff; /* Borde más grueso */
+            border: 3px solid #ffffff;
             box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8), inset 0 0 8px rgba(255,255,255,0.5);
             transform: scale(1.1);
             z-index: 50;
@@ -83,7 +87,6 @@
         
         .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        /* Aumento del 50% en el texto seleccionado */
         .color-val { 
             font-size: 9px; 
             font-weight: 900; 
@@ -91,10 +94,10 @@
             transition: transform 0.2s ease;
         }
         .color-card.selected .color-val {
-            transform: scale(1.5); /* 50% más grande */
+            transform: scale(1.5);
         }
 
-        /* Colores */
+        /* Colores Ajustados */
         .c-black { background-color: #000000; color: white; }
         .c-brown { background-color: #5d2e0a; color: white; }
         .c-red   { background-color: #dc2626; color: white; }
@@ -103,10 +106,10 @@
         .c-green  { background-color: #166534; color: white; }
         .c-blue   { background-color: #1e40af; color: white; }
         .c-violet { background-color: #7c3aed; color: white; }
-        .c-gray   { background-color: #4b5563; color: white; }
+        .c-gray   { background-color: #64748b; color: white; } /* Gris un poco más claro */
         .c-white  { background-color: #ffffff; color: black; }
         .c-gold   { background-color: #b8860b; color: white; }
-        .c-silver { background-color: #e2e8f0; color: #1e293b; } /* Plata más brillante */
+        .c-silver { background-color: #cbd5e1; color: #1e293b; } /* Plata un poco más oscuro */
 
         .column-title {
             font-size: 8px; 
@@ -118,11 +121,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 2px;
         }
         .hidden-col { visibility: hidden; pointer-events: none; }
     </style>
 </head>
-<body class="theme-green">
+<body class="theme-light">
 
 <div class="app-container">
     
@@ -131,10 +135,11 @@
         <div class="flex justify-between items-center mb-1">
             <h1 class="text-[10px] font-black uppercase italic tracking-wider">Resistor Pro Advance</h1>
             <div class="flex gap-2 items-center">
-                <div onclick="setTheme('green')" class="theme-dot bg-emerald-700 active"></div>
+                <div onclick="setTheme('light')" class="theme-dot bg-white active"></div>
                 <div onclick="setTheme('dark')" class="theme-dot bg-slate-950"></div>
+                <div onclick="setTheme('green')" class="theme-dot bg-emerald-700"></div>
                 <div onclick="setTheme('blue')" class="theme-dot bg-sky-600"></div>
-                <div onclick="setTheme('light')" class="theme-dot bg-white border-slate-300"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-pink-400"></div>
             </div>
         </div>
         <div class="glass-panel flex p-0.5 gap-1">
@@ -147,23 +152,23 @@
 
     <!-- PANTALLA DE RESULTADOS -->
     <div class="section-display">
-        <div class="flex gap-1.5 h-1/2">
+        <div class="flex gap-1.5 h-1/2 mb-1">
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
                 <span class="text-[7px] uppercase font-bold opacity-60">Valor Nominal</span>
-                <span id="txt-val" class="text-xl font-black tracking-tighter">1.0k Ω</span>
+                <span id="txt-val" class="text-lg font-black tracking-tighter leading-none">1.0k Ω</span>
             </div>
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
                 <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
-                <span id="txt-tol" class="text-xl font-black text-emerald-400">±5%</span>
+                <span id="txt-tol" class="text-lg font-black text-emerald-500 leading-none">±5%</span>
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
                 <span class="text-[7px] uppercase font-bold opacity-60">Coef. PPM</span>
-                <span id="txt-temp" class="text-xl font-black text-orange-400">100</span>
+                <span id="txt-temp" class="text-lg font-black text-orange-500 leading-none">100</span>
             </div>
         </div>
 
         <div class="h-1/2 flex items-center justify-center">
-            <svg viewBox="0 0 300 60" class="w-full h-10">
+            <svg viewBox="0 0 300 60" class="w-full h-8">
                 <rect x="0" y="27" width="300" height="6" fill="#94a3b8" opacity="0.4" />
                 <rect x="60" y="10" width="180" height="40" rx="10" fill="#d2b48c" />
                 <rect id="v-b1" x="85" y="10" width="12" height="40" fill="#5d2e0a" />
@@ -178,7 +183,7 @@
 
     <!-- TECLADO DE COLORES -->
     <div class="section-keypad">
-        <div class="grid grid-cols-6 gap-x-1.5 mb-1 text-center">
+        <div class="grid grid-cols-6 gap-x-1.5 text-center">
             <span class="column-title">BANDA 1</span>
             <span class="column-title">BANDA 2</span>
             <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
@@ -214,10 +219,10 @@
         { code: 'c-green', hex: '#166534', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
         { code: 'c-blue', hex: '#1e40af', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
         { code: 'c-violet', hex: '#7c3aed', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
-        { code: 'c-gray', hex: '#4b5563', val: 8, mult: null, tol: 0.05, ppm: 1 },
+        { code: 'c-gray', hex: '#64748b', val: 8, mult: null, tol: 0.05, ppm: 1 },
         { code: 'c-white', hex: '#ffffff', val: 9, mult: null, tol: null, ppm: null },
         { code: 'c-gold', hex: '#b8860b', val: null, mult: 0.1, tol: 5, ppm: null },
-        { code: 'c-silver', hex: '#e2e8f0', val: null, mult: 0.01, tol: 10, ppm: null }
+        { code: 'c-silver', hex: '#cbd5e1', val: null, mult: 0.01, tol: 10, ppm: null }
     ];
 
     let currentBands = 4;
