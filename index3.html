@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Resistor Pro Advance - Edge 50</title>
+    <title>Resistor Pro Advance - V2.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Bloqueo total de desplazamiento exterior */
         html, body {
-            overflow: hidden;
+            overflow: hidden; /* Elimina scroll global */
             height: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
             user-select: none;
-            touch-action: manipulation;
+            touch-action: none; /* Previene gestos de zoom/scroll */
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Variables de Temas */
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-blue { background-color: #bae6fd; color: #0369a1; }
@@ -29,17 +27,15 @@
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding-left: 12px;
-            padding-right: 12px;
-            padding-top: env(safe-area-inset-top, 10px);
-            padding-bottom: env(safe-area-inset-bottom, 10px);
+            padding: env(safe-area-inset-top, 8px) 12px env(safe-area-inset-bottom, 8px);
+            justify-content: space-between;
         }
 
-        /* Secciones con divisores solicitados */
-        .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid rgba(128, 128, 128, 0.15); }
-        .section-display { height: 20%; display: flex; flex-direction: column; justify-content: center; padding: 2px 0; border-bottom: 1px solid rgba(128, 128, 128, 0.15); }
-        .section-keypad  { height: 50%; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1px solid rgba(128, 128, 128, 0.15); padding-top: 8px; }
-        .section-footer  { height: 20%; display: flex; align-items: center; gap: 12px; }
+        /* Secciones con alturas fijas proporcionales para evitar scroll */
+        .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
+        .section-display { height: 18%; display: flex; flex-direction: column; justify-content: center; }
+        .section-keypad  { height: 60%; display: flex; flex-direction: column; }
+        .section-footer  { height: 12%; display: flex; align-items: center; gap: 12px; }
 
         .glass-panel {
             background: rgba(0, 0, 0, 0.05);
@@ -47,116 +43,85 @@
             border-radius: 12px;
             padding: 4px 8px;
         }
-        
         body.theme-dark .glass-panel { background: rgba(255, 255, 255, 0.05); }
 
-        .theme-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
         .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); }
 
         .band-btn {
-            flex: 1;
-            padding: 2px 0;
-            font-size: 10px;
-            font-weight: 900;
-            border-radius: 6px;
-            transition: all 0.2s;
-            color: inherit;
-            opacity: 0.6;
+            flex: 1; padding: 4px 0; font-size: 11px; font-weight: 900; border-radius: 8px;
+            transition: all 0.2s; color: inherit; opacity: 0.5;
         }
         .band-btn.active { background: #3b82f6; color: white; opacity: 1; }
 
-        /* Estilos del Teclado Compacto */
         .color-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             column-gap: 6px; 
-            row-gap: 6px;    
-            overflow-y: auto;
-            padding-bottom: 20px;
+            row-gap: 3px; /* Espacio mínimo para ajustar a pantalla */
+            flex-grow: 1;
         }
-        
-        .color-grid::-webkit-scrollbar { width: 0; background: transparent; }
 
         .color-card {
-            height: 22px; 
+            height: 100%; /* Se adapta al contenedor */
+            min-height: 24px;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(128, 128, 128, 0.1);
-            transition: all 0.15s;
+            border: 1px solid rgba(128, 128, 128, 0.15);
+            transition: all 0.1s ease;
             cursor: pointer;
         }
         
-        /* Iluminación al seleccionar */
         .color-card.selected {
             border: 2px solid #3b82f6;
-            box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
             transform: scale(1.05);
-            z-index: 5;
+            z-index: 10;
         }
         
-        .color-card.disabled { opacity: 0.05; pointer-events: none; filter: grayscale(1); }
+        .color-card.disabled { opacity: 0.03; pointer-events: none; }
 
-        .color-val {
-            font-size: 10px;
-            font-weight: 900;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.5);
-        }
+        .color-val { font-size: 10px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
 
-        /* Colores de las bandas */
+        /* Colores Ajustados */
         .c-black { background-color: #000000; color: white; }
-        .c-brown { background-color: #8B4513; color: white; }
-        .c-red   { background-color: #FF0000; color: white; }
-        .c-orange { background-color: #FF8C00; color: white; }
-        .c-yellow { background-color: #FFD700; color: black; }
-        .c-green  { background-color: #008000; color: white; }
-        .c-blue   { background-color: #0000FF; color: white; }
-        .c-violet { background-color: #EE82EE; color: black; }
-        .c-gray   { background-color: #808080; color: white; }
-        .c-white  { background-color: #FFFFFF; color: black; }
-        .c-gold   { background-color: #D4AF37; color: black; }
-        .c-silver { background-color: #C0C0C0; color: black; }
-
-        .res-box {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        .c-brown { background-color: #633311; color: white; }
+        .c-red   { background-color: #e11d48; color: white; }
+        .c-orange { background-color: #f97316; color: white; }
+        .c-yellow { background-color: #facc15; color: black; }
+        .c-green  { background-color: #16a34a; color: white; }
+        .c-blue   { background-color: #2563eb; color: white; }
+        .c-violet { background-color: #6d28d9; color: white; } /* Violeta Intenso */
+        .c-gray   { background-color: #64748b; color: white; }
+        .c-white  { background-color: #ffffff; color: black; }
+        .c-gold   { background-color: #a16207; color: white; } /* Oro Intenso */
+        .c-silver { background-color: #71717a; color: white; } /* Plata Intenso */
 
         .column-title {
-            font-size: 12px; 
+            font-size: 10px; 
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.02em;
             opacity: 0.5;
-            transition: opacity 0.3s;
         }
-        .column-title.hidden-col { opacity: 0; }
+        .hidden-col { visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body class="theme-dark">
 
 <div class="app-container">
     
-    <!-- BLOQUE 1: ENCABEZADO (10%) -->
+    <!-- ENCABEZADO -->
     <div class="section-header">
         <div class="flex justify-between items-center mb-1">
-            <h1 class="text-[9px] font-black tracking-tighter uppercase italic opacity-80">Resistor Pro Advance</h1>
+            <h1 class="text-[9px] font-black uppercase italic opacity-80">FES Aragón - UNAM</h1>
             <div class="flex gap-1.5 items-center">
-                <div onclick="setTheme('dark')" class="theme-dot bg-slate-900 active" title="Oscuro"></div>
-                <div onclick="setTheme('light')" class="theme-dot bg-white" title="Claro"></div>
-                <div onclick="setTheme('blue')" class="theme-dot bg-sky-500" title="Azul"></div>
-                <div onclick="setTheme('pink')" class="theme-dot bg-pink-500" title="Rosa"></div>
-                <div onclick="setTheme('green')" class="theme-dot bg-emerald-500" title="Verde"></div>
+                <div onclick="setTheme('dark')" class="theme-dot bg-slate-900 active"></div>
+                <div onclick="setTheme('light')" class="theme-dot bg-white border-slate-300"></div>
+                <div onclick="setTheme('blue')" class="theme-dot bg-sky-500"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-pink-500"></div>
             </div>
         </div>
         <div class="glass-panel flex p-0.5 gap-1">
@@ -167,62 +132,57 @@
         </div>
     </div>
 
-    <!-- BLOQUE 2: RESULTADOS Y GRÁFICO (20%) -->
+    <!-- PANTALLA DE RESULTADOS -->
     <div class="section-display">
-        <div class="flex gap-2">
-            <div class="glass-panel res-box">
+        <div class="flex gap-1.5 h-1/2">
+            <div class="glass-panel flex-1 text-center flex flex-col justify-center">
                 <span class="text-[7px] uppercase font-bold opacity-60">Valor</span>
-                <span id="txt-val" class="text-xl font-black leading-none tracking-tighter">10k Ω</span>
+                <span id="txt-val" class="text-lg font-black tracking-tighter">1.0k Ω</span>
             </div>
-            <div class="glass-panel res-box">
-                <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
-                <span id="txt-tol" class="text-xl font-black leading-none text-emerald-500">±5%</span>
+            <div class="glass-panel flex-1 text-center flex flex-col justify-center">
+                <span class="text-[7px] uppercase font-bold opacity-60">Tol.</span>
+                <span id="txt-tol" class="text-lg font-black text-emerald-500">±5%</span>
             </div>
-            <div id="box-temp" class="glass-panel res-box hidden">
+            <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
                 <span class="text-[7px] uppercase font-bold opacity-60">PPM</span>
-                <span id="txt-temp" class="text-xl font-black leading-none text-orange-400">-</span>
+                <span id="txt-temp" class="text-lg font-black text-orange-400">100</span>
             </div>
         </div>
 
-        <div class="flex items-center justify-center mt-1">
-            <svg viewBox="0 0 300 60" class="w-full h-full max-h-[55px]">
-                <!-- Alambre -->
-                <rect x="0" y="26" width="300" height="8" fill="#64748b" opacity="0.3" />
-                <!-- Cuerpo -->
-                <rect x="60" y="5" width="180" height="50" rx="12" fill="#d2b48c" stroke="rgba(0,0,0,0.1)" />
-                <!-- Bandas -->
-                <rect id="v-b1" x="85" y="5" width="12" height="50" fill="#8B4513" />
+        <div class="h-1/2 flex items-center justify-center">
+            <svg viewBox="0 0 300 60" class="w-full h-10">
+                <rect x="0" y="27" width="300" height="6" fill="#94a3b8" opacity="0.3" />
+                <rect x="60" y="10" width="180" height="40" rx="8" fill="#ccac81" />
+                <rect id="v-b1" x="85" y="10" width="12" height="40" fill="#633311" />
                 <rect id="v-b2" x="110" y="10" width="10" height="40" fill="#000000" />
                 <rect id="v-b3" x="135" y="10" width="10" height="40" fill="transparent" class="hidden" />
-                <rect id="v-bm" x="160" y="10" width="10" height="40" fill="#FF8C00" />
-                <rect id="v-bt" x="195" y="10" width="12" height="40" fill="#D4AF37" />
+                <rect id="v-bm" x="160" y="10" width="10" height="40" fill="#f97316" />
+                <rect id="v-bt" x="195" y="10" width="12" height="40" fill="#a16207" />
                 <rect id="v-bc" x="220" y="10" width="8" height="40" fill="transparent" class="hidden" />
             </svg>
         </div>
     </div>
 
-    <!-- BLOQUE 3: TECLADO (50%) -->
+    <!-- TECLADO DE COLORES -->
     <div class="section-keypad">
-        <div class="grid grid-cols-6 column-gap-6 mb-2 px-1 text-center">
-            <span class="column-title">BANDA 1</span>
-            <span class="column-title">BANDA 2</span>
-            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
-            <span class="column-title">MULT.</span>
-            <span id="kb-lbl-tol" class="column-title">TOL.</span>
+        <div class="grid grid-cols-6 gap-x-1.5 mb-1 text-center">
+            <span class="column-title">B1</span>
+            <span class="column-title">B2</span>
+            <span id="kb-lbl-d3" class="column-title hidden-col">B3</span>
+            <span class="column-title">MULT</span>
+            <span id="kb-lbl-tol" class="column-title">TOL</span>
             <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
         </div>
-        <div id="keyboard" class="color-grid flex-grow">
-            <!-- JS inyecta aquí 6 botones por cada color -->
-        </div>
+        <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- BLOQUE 4: ACCIONES (20%) -->
+    <!-- ACCIONES FINALES -->
     <div class="section-footer">
-        <button class="flex-[3] bg-blue-600 h-12 rounded-xl font-black text-[11px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
-            Guardar Medida
+        <button class="flex-[4] bg-blue-600 h-12 rounded-xl font-black text-[11px] text-white shadow-lg active:scale-95 uppercase">
+            Guardar Configuración
         </button>
-        <button class="flex-1 bg-slate-800 h-12 rounded-xl flex items-center justify-center text-xl active:scale-95 border border-white/5">
-            🔦
+        <button onclick="location.reload()" class="flex-1 bg-slate-800 h-12 rounded-xl flex items-center justify-center text-lg active:scale-95">
+            🔄
         </button>
     </div>
 
@@ -230,61 +190,39 @@
 
 <script>
     const colors = [
-        { name: 'Negro', code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: null },
-        { name: 'Marrón', code: 'c-brown', hex: '#8B4513', val: 1, mult: 10, tol: 1, ppm: 100 },
-        { name: 'Rojo', code: 'c-red', hex: '#FF0000', val: 2, mult: 100, tol: 2, ppm: 50 },
-        { name: 'Naranja', code: 'c-orange', hex: '#FF8C00', val: 3, mult: 1000, tol: null, ppm: 15 },
-        { name: 'Amarillo', code: 'c-yellow', hex: '#FFD700', val: 4, mult: 10000, tol: null, ppm: 25 },
-        { name: 'Verde', code: 'c-green', hex: '#008000', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
-        { name: 'Azul', code: 'c-blue', hex: '#0000FF', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
-        { name: 'Violeta', code: 'c-violet', hex: '#EE82EE', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
-        { name: 'Gris', code: 'c-gray', hex: '#808080', val: 8, mult: null, tol: 0.05, ppm: 1 },
-        { name: 'Blanco', code: 'c-white', hex: '#FFFFFF', val: 9, mult: null, tol: null, ppm: null },
-        { name: 'Oro', code: 'c-gold', hex: '#D4AF37', val: null, mult: 0.1, tol: 5, ppm: null },
-        { name: 'Plata', code: 'c-silver', hex: '#C0C0C0', val: null, mult: 0.01, tol: 10, ppm: null }
+        { code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: null },
+        { code: 'c-brown', hex: '#633311', val: 1, mult: 10, tol: 1, ppm: 100 },
+        { code: 'c-red', hex: '#e11d48', val: 2, mult: 100, tol: 2, ppm: 50 },
+        { code: 'c-orange', hex: '#f97316', val: 3, mult: 1000, tol: null, ppm: 15 },
+        { code: 'c-yellow', hex: '#facc15', val: 4, mult: 10000, tol: null, ppm: 25 },
+        { code: 'c-green', hex: '#16a34a', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
+        { code: 'c-blue', hex: '#2563eb', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
+        { code: 'c-violet', hex: '#6d28d9', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
+        { code: 'c-gray', hex: '#64748b', val: 8, mult: null, tol: 0.05, ppm: 1 },
+        { code: 'c-white', hex: '#ffffff', val: 9, mult: null, tol: null, ppm: null },
+        { code: 'c-gold', hex: '#a16207', val: null, mult: 0.1, tol: 5, ppm: null },
+        { code: 'c-silver', hex: '#71717a', val: null, mult: 0.01, tol: 10, ppm: null }
     ];
 
     let currentBands = 4;
-    let selections = {
-        b1: 1, // Marrón
-        b2: 0, // Negro
-        b3: 0, // Negro
-        mult: 1000, // Naranja
-        tol: 5, // Oro
-        ppm: null
-    };
+    let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 100 };
 
     function initKeyboard() {
         const kb = document.getElementById('keyboard');
         kb.innerHTML = '';
-        
         colors.forEach(c => {
             for(let i=0; i<6; i++) {
                 const btn = document.createElement('div');
                 btn.id = `btn-col-${i}-${c.code}`;
                 btn.className = `color-card ${c.code}`;
                 
-                let displayVal = "-";
-                let isDisabled = false;
+                let displayVal = "";
+                if (i < 3) displayVal = c.val !== null ? c.val : "-";
+                else if (i === 3) displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : "-";
+                else if (i === 4) displayVal = c.tol !== null ? c.tol + "%" : "-";
+                else if (i === 5) displayVal = c.ppm !== null ? c.ppm : "-";
 
-                if (i < 3) { // Bandas 1, 2 y 3
-                    displayVal = c.val !== null ? c.val : "-";
-                    if (c.val === null) isDisabled = true;
-                } else if (i === 3) { // Multiplicador
-                    if (c.mult !== null) {
-                        displayVal = c.mult < 1 ? c.mult : (c.mult >= 1000 ? (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult/1000)+"k") : "x" + c.mult);
-                    } else isDisabled = true;
-                } else if (i === 4) { // Tolerancia
-                    displayVal = c.tol !== null ? c.tol + "%" : "-";
-                    if (c.tol === null) isDisabled = true;
-                } else { // PPM
-                    displayVal = c.ppm !== null ? c.ppm : "-";
-                    if (c.ppm === null) isDisabled = true;
-                }
-
-                if(isDisabled) btn.classList.add('disabled');
-
-                btn.onclick = () => !isDisabled && selectColor(i, c);
+                btn.onclick = () => selectColor(i, c);
                 btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
                 kb.appendChild(btn);
             }
@@ -292,120 +230,69 @@
         updateUI();
     }
 
-    function selectColor(colIndex, colorObj) {
+    function selectColor(col, color) {
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
-        const target = keys[colIndex];
-        
-        selections[target] = (colIndex === 3) ? colorObj.mult : (colIndex === 4 ? colorObj.tol : (colIndex === 5 ? colorObj.ppm : colorObj.val));
-        
-        // Actualizar visual de la resistencia
-        const svgMap = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
-        document.getElementById(svgMap[colIndex]).setAttribute('fill', colorObj.hex);
-        
+        const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
+        if (col < 3 && color.val === null) return;
+        if (col === 3 && color.mult === null) return;
+        if (col === 4 && color.tol === null) return;
+        if (col === 5 && color.ppm === null) return;
+        selections[keys[col]] = (col === 3) ? color.mult : (col === 4 ? color.tol : (col === 5 ? color.ppm : color.val));
+        document.getElementById(svgIds[col]).setAttribute('fill', color.hex);
         updateUI();
     }
 
     function updateUI() {
-        // Actualizar estados "selected" en el teclado
-        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected'));
-        
+        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected', 'disabled'));
         colors.forEach(c => {
-            if (selections.b1 === c.val) document.getElementById(`btn-col-0-${c.code}`)?.classList.add('selected');
-            if (selections.b2 === c.val) document.getElementById(`btn-col-1-${c.code}`)?.classList.add('selected');
-            if (selections.b3 === c.val) document.getElementById(`btn-col-2-${c.code}`)?.classList.add('selected');
-            if (selections.mult === c.mult) document.getElementById(`btn-col-3-${c.code}`)?.classList.add('selected');
-            if (selections.tol === c.tol) document.getElementById(`btn-col-4-${c.code}`)?.classList.add('selected');
-            if (selections.ppm === c.ppm && c.ppm !== null) document.getElementById(`btn-col-5-${c.code}`)?.classList.add('selected');
+            if (selections.b1 === c.val) document.getElementById(`btn-col-0-${c.code}`).classList.add('selected');
+            if (selections.b2 === c.val) document.getElementById(`btn-col-1-${c.code}`).classList.add('selected');
+            if (selections.b3 === c.val) document.getElementById(`btn-col-2-${c.code}`).classList.add('selected');
+            if (selections.mult === c.mult) document.getElementById(`btn-col-3-${c.code}`).classList.add('selected');
+            if (selections.tol === c.tol) document.getElementById(`btn-col-4-${c.code}`).classList.add('selected');
+            if (selections.ppm === c.ppm && c.ppm !== null) document.getElementById(`btn-col-5-${c.code}`).classList.add('selected');
+            if (currentBands < 5) document.getElementById(`btn-col-2-${c.code}`).classList.add('disabled');
+            if (currentBands === 3) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
+            if (currentBands < 6) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
+            if (c.val === null) { [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled')); }
+            if (c.mult === null) document.getElementById(`btn-col-3-${c.code}`).classList.add('disabled');
+            if (c.tol === null) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
+            if (c.ppm === null) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
         });
-
-        // Actualizar habilitación de columnas según bandas
-        for(let color of colors) {
-            const btnD3 = document.getElementById(`btn-col-2-${color.code}`);
-            const btnTol = document.getElementById(`btn-col-4-${color.code}`);
-            const btnPPM = document.getElementById(`btn-col-5-${color.code}`);
-            
-            // Banda 3 se activa solo en 5B y 6B
-            if (currentBands < 5) btnD3.classList.add('disabled');
-            else if (color.val !== null) btnD3.classList.remove('disabled');
-
-            // Tolerancia se desactiva en 3B
-            if (currentBands === 3) btnTol.classList.add('disabled');
-            else if (color.tol !== null) btnTol.classList.remove('disabled');
-
-            // PPM se activa solo en 6B
-            if (currentBands < 6) btnPPM.classList.add('disabled');
-            else if (color.ppm !== null) btnPPM.classList.remove('disabled');
-        }
-
-        calculateResult();
+        calculate();
     }
 
-    function calculateResult() {
-        let baseValue = 0;
-        if (currentBands < 5) {
-            baseValue = (selections.b1 * 10) + selections.b2;
-        } else {
-            baseValue = (selections.b1 * 100) + (selections.b2 * 10) + selections.b3;
-        }
-
-        const total = baseValue * selections.mult;
-        
-        // Formateo
-        let formatted = "";
-        if (total >= 1000000) formatted = (total/1000000).toFixed(total % 1000000 === 0 ? 0 : 2) + "M";
-        else if (total >= 1000) formatted = (total/1000).toFixed(total % 1000 === 0 ? 0 : 2) + "k";
-        else formatted = total.toFixed(total % 1 === 0 ? 0 : 2);
-
-        document.getElementById('txt-val').innerText = formatted + " Ω";
-        document.getElementById('txt-tol').innerText = (currentBands === 3 ? "±20%" : "±" + selections.tol + "%");
-        document.getElementById('txt-temp').innerText = (selections.ppm || "-");
+    function calculate() {
+        let val = (currentBands < 5) ? (selections.b1 * 10 + selections.b2) : (selections.b1 * 100 + selections.b2 * 10 + selections.b3);
+        let total = val * selections.mult;
+        let label = total >= 1000000 ? (total/1000000).toFixed(total % 1000000 === 0 ? 0 : 2) + "M" : 
+                    (total >= 1000 ? (total/1000).toFixed(total % 1000 === 0 ? 0 : 2) + "k" : total.toFixed(total % 1 === 0 ? 0 : 2));
+        document.getElementById('txt-val').innerText = label + " Ω";
+        document.getElementById('txt-tol').innerText = currentBands === 3 ? "±20%" : "±" + selections.tol + "%";
+        document.getElementById('txt-temp').innerText = selections.ppm || "--";
     }
 
-    function setTheme(theme) {
-        document.body.className = 'theme-' + theme;
-        document.querySelectorAll('.theme-dot').forEach(dot => {
-            dot.classList.remove('active');
-            if(dot.title.toLowerCase() === (theme === 'dark' ? 'oscuro' : theme === 'light' ? 'claro' : theme)) {
-                dot.classList.add('active');
-            }
-        });
+    function setTheme(t) { 
+        document.body.className = 'theme-' + t;
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        event.currentTarget.classList.add('active');
     }
 
     function setBands(n) {
         currentBands = n;
-        document.querySelectorAll('.band-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-' + n + 'b').classList.add('active');
-        
-        const b3 = document.getElementById('v-b3');
-        const bt = document.getElementById('v-bt');
-        const bc = document.getElementById('v-bc');
-        const boxTemp = document.getElementById('box-temp');
-        
-        const lblD3 = document.getElementById('kb-lbl-d3');
-        const lblTol = document.getElementById('kb-lbl-tol');
-        const lblPPM = document.getElementById('kb-lbl-ppm');
-
-        // Visibilidad en Imagen
-        b3.classList.toggle('hidden', n < 5);
-        bt.classList.toggle('hidden', n === 3);
-        bc.classList.toggle('hidden', n < 6);
-        
-        // Visibilidad en Resultados
-        boxTemp.classList.toggle('hidden', n < 6);
-
-        // Visibilidad en Títulos de Teclado
-        lblD3.classList.toggle('hidden-col', n < 5);
-        lblTol.classList.toggle('hidden-col', n === 3);
-        lblPPM.classList.toggle('hidden-col', n < 6);
-
+        document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+n+'b').classList.add('active');
+        document.getElementById('v-b3').classList.toggle('hidden', n < 5);
+        document.getElementById('v-bt').classList.toggle('hidden', n === 3);
+        document.getElementById('v-bc').classList.toggle('hidden', n < 6);
+        document.getElementById('box-temp').classList.toggle('hidden', n < 6);
+        document.getElementById('kb-lbl-d3').classList.toggle('hidden-col', n < 5);
+        document.getElementById('kb-lbl-tol').classList.toggle('hidden-col', n === 3);
+        document.getElementById('kb-lbl-ppm').classList.toggle('hidden-col', n < 6);
         updateUI();
     }
 
-    window.onload = () => {
-        initKeyboard();
-        setBands(4); // Iniciar en 4 bandas por defecto
-    };
+    window.onload = initKeyboard;
 </script>
-
 </body>
 </html>
