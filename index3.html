@@ -14,10 +14,8 @@
             padding: 0;
             user-select: none;
             touch-action: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Temas */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
         body.theme-green { background-color: #064e3b; color: #ecfdf5; }
@@ -34,10 +32,8 @@
 
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
         .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
-        /* Bloque 3: 55% */
         .section-keypad  { height: 55%; display: flex; flex-direction: column; }
-        /* Bloque 4: 20% */
-        .section-footer  { height: 20%; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+        .section-footer  { height: 20%; display: flex; flex-direction: column; justify-content: center; }
 
         .glass-panel {
             background: rgba(0, 0, 0, 0.05);
@@ -61,7 +57,6 @@
             column-gap: 6px; 
             row-gap: 3px;
             flex-grow: 1;
-            margin-top: 2px; 
         }
 
         .color-card {
@@ -74,29 +69,19 @@
             border: 1px solid rgba(128, 128, 128, 0.2);
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            position: relative;
         }
         
         .color-card.selected {
             border: 3px solid #ffffff;
-            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8), inset 0 0 8px rgba(255,255,255,0.5);
+            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
             transform: scale(1.1);
-            z-index: 50;
+            z-index: 10;
         }
         
         .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        .color-val { 
-            font-size: 9px; 
-            font-weight: 900; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
-            transition: transform 0.2s ease;
-        }
-        .color-card.selected .color-val {
-            transform: scale(1.5);
-        }
+        .color-val { font-size: 9px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
-        /* Colores Ajustados */
         .c-black { background-color: #000000; color: white; }
         .c-brown { background-color: #5d2e0a; color: white; }
         .c-red   { background-color: #dc2626; color: white; }
@@ -111,18 +96,13 @@
         .c-silver { background-color: #cbd5e1; color: #1e293b; }
 
         .column-title {
-            font-size: 8px; 
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -0.01em;
-            line-height: 1;
-            opacity: 0.7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 2px;
+            font-size: 8px; font-weight: 900; text-transform: uppercase;
+            opacity: 0.7; margin-bottom: 2px;
         }
         .hidden-col { visibility: hidden; pointer-events: none; }
+        
+        /* Aumento del 25% en los textos de resultados */
+        .result-text { font-size: 1.56rem; font-weight: 900; line-height: 1; }
     </style>
 </head>
 <body class="theme-light">
@@ -154,53 +134,56 @@
         <div class="flex gap-1.5 h-1/2 mb-1">
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
                 <span class="text-[7px] uppercase font-bold opacity-60">Valor Nominal</span>
-                <span id="txt-val" class="text-lg font-black tracking-tighter leading-none">1.0k Ω</span>
+                <span id="txt-val" class="result-text tracking-tighter">1.0k Ω</span>
             </div>
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
                 <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
-                <span id="txt-tol" class="text-lg font-black text-emerald-500 leading-none">±5%</span>
+                <span id="txt-tol" class="result-text text-emerald-500">±5%</span>
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
                 <span class="text-[7px] uppercase font-bold opacity-60">Coef. PPM</span>
-                <span id="txt-temp" class="text-lg font-black text-orange-500 leading-none">100</span>
+                <span id="txt-temp" class="result-text text-orange-500">100</span>
             </div>
         </div>
 
-        <div class="h-1/2 flex items-center justify-center">
-            <!-- Resistencia aumentada en escala para ver mejor las bandas -->
-            <svg viewBox="0 0 300 70" class="w-full h-10">
-                <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
-                <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
-                <rect id="v-b1" x="80" y="5" width="16" height="60" fill="#5d2e0a" />
-                <rect id="v-b2" x="110" y="5" width="14" height="60" fill="#000000" />
-                <rect id="v-b3" x="140" y="5" width="14" height="60" fill="transparent" class="hidden" />
-                <rect id="v-bm" x="170" y="5" width="14" height="60" fill="#ea580c" />
-                <rect id="v-bt" x="210" y="5" width="16" height="60" fill="#b8860b" />
-                <rect id="v-bc" x="238" y="5" width="10" height="60" fill="transparent" class="hidden" />
-            </svg>
+        <div class="h-1/2 flex items-center gap-2">
+            <!-- Resistencia y Botón Reiniciar al lado -->
+            <div class="flex-grow flex justify-center">
+                <svg viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
+                    <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
+                    <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
+                    <!-- Bandas ensanchadas y reubicadas para no cortar la 6ta -->
+                    <rect id="v-b1" x="75" y="5" width="16" height="60" fill="#5d2e0a" />
+                    <rect id="v-b2" x="105" y="5" width="14" height="60" fill="#000000" />
+                    <rect id="v-b3" x="135" y="5" width="14" height="60" fill="transparent" class="hidden" />
+                    <rect id="v-bm" x="165" y="5" width="14" height="60" fill="#ea580c" />
+                    <rect id="v-bt" x="200" y="5" width="16" height="60" fill="#b8860b" />
+                    <rect id="v-bc" x="230" y="5" width="12" height="60" fill="transparent" class="hidden" />
+                </svg>
+            </div>
+            <button onclick="location.reload()" class="w-12 h-10 bg-white/10 rounded-lg flex items-center justify-center text-lg active:scale-90 border border-white/5 flex-shrink-0">
+                🔄
+            </button>
         </div>
     </div>
 
     <!-- TECLADO DE COLORES -->
     <div class="section-keypad">
         <div class="grid grid-cols-6 gap-x-1.5 text-center">
-            <span class="column-title">BANDA 1</span>
-            <span class="column-title">BANDA 2</span>
-            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
-            <span class="column-title">MULT.</span>
-            <span id="kb-lbl-tol" class="column-title">TOLER.</span>
+            <span class="column-title">B1</span>
+            <span class="column-title">B2</span>
+            <span id="kb-lbl-d3" class="column-title hidden-col">B3</span>
+            <span class="column-title">MULT</span>
+            <span id="kb-lbl-tol" class="column-title">TOL</span>
             <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
         </div>
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- ACCIONES FINALES (Sin texto institucional) -->
+    <!-- ACCIONES FINALES -->
     <div class="section-footer">
-        <button class="w-full bg-blue-600 h-12 rounded-xl font-black text-[12px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
+        <button class="w-full bg-blue-600 h-14 rounded-2xl font-black text-[14px] text-white shadow-xl active:scale-95 uppercase tracking-widest">
             Guardar Captura
-        </button>
-        <button onclick="location.reload()" class="w-full h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg active:scale-90 border border-white/5">
-            🔄 Reiniciar
         </button>
     </div>
 
@@ -208,7 +191,7 @@
 
 <script>
     const colors = [
-        { code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: null },
+        { code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: 250 },
         { code: 'c-brown', hex: '#5d2e0a', val: 1, mult: 10, tol: 1, ppm: 100 },
         { code: 'c-red', hex: '#dc2626', val: 2, mult: 100, tol: 2, ppm: 50 },
         { code: 'c-orange', hex: '#ea580c', val: 3, mult: 1000, tol: null, ppm: 15 },
@@ -223,6 +206,9 @@
     ];
 
     let currentBands = 4;
+    // Flags para detectar primera vez que se entra a un modo
+    let visited5 = false;
+    let visited6 = false;
     let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 100 };
 
     function initKeyboard() {
@@ -240,7 +226,7 @@
                 else if (i === 4) displayVal = c.tol !== null ? c.tol + "%" : "";
                 else if (i === 5) displayVal = c.ppm !== null ? c.ppm : "";
 
-                btn.onclick = (e) => selectColor(i, c, e);
+                btn.onclick = (e) => selectColor(i, c);
                 btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
                 kb.appendChild(btn);
             }
@@ -249,7 +235,7 @@
         updateUI();
     }
 
-    function selectColor(col, color, event) {
+    function selectColor(col, color) {
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
         if (col < 3 && color.val === null) return;
         if (col === 3 && color.mult === null) return;
@@ -293,7 +279,7 @@
             if (currentBands === 3) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
             if (currentBands < 6) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
             
-            if (c.val === null) { [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled')); }
+            if (c.val === null) [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled'));
             if (c.mult === null) document.getElementById(`btn-col-3-${c.code}`).classList.add('disabled');
             if (c.tol === null) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
             if (c.ppm === null) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
@@ -320,11 +306,16 @@
     function setBands(n) {
         currentBands = n;
         
-        // Valores por defecto al habilitar nuevas bandas:
-        // Banda 3 en "0", Tolerancia en "5%", PPM en café (100)
-        if (n >= 5) selections.b3 = 0;
-        if (n >= 4) selections.tol = 5;
-        if (n === 6) selections.ppm = 100;
+        // Lógica de valores por defecto solo la primera vez que se activan
+        if (n >= 5 && !visited5) {
+            selections.b3 = 0; // Banda 3 en Negro
+            visited5 = true;
+        }
+        
+        if (n === 6 && !visited6) {
+            selections.ppm = 100; // Banda 6 en Café
+            visited6 = true;
+        }
 
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+n+'b').classList.add('active');
