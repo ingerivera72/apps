@@ -35,10 +35,10 @@
             padding-bottom: env(safe-area-inset-bottom, 10px);
         }
 
-        /* Redistribución de Alturas Solicitada */
-        .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; margin-bottom: 2px; }
-        .section-display { height: 20%; display: flex; flex-direction: column; justify-content: center; padding: 2px 0; gap: 4px; }
-        .section-keypad  { height: 50%; display: flex; flex-direction: column; overflow: hidden; }
+        /* Secciones con divisores solicitados */
+        .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid rgba(128, 128, 128, 0.15); }
+        .section-display { height: 20%; display: flex; flex-direction: column; justify-content: center; padding: 2px 0; border-bottom: 1px solid rgba(128, 128, 128, 0.15); }
+        .section-keypad  { height: 50%; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1px solid rgba(128, 128, 128, 0.15); padding-top: 8px; }
         .section-footer  { height: 20%; display: flex; align-items: center; gap: 12px; }
 
         .glass-panel {
@@ -75,8 +75,8 @@
         .color-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            column-gap: 6px; /* Aumentado 2px */
-            row-gap: 6px;    /* Misma separación que horizontal */
+            column-gap: 6px; 
+            row-gap: 6px;    
             overflow-y: auto;
             padding-bottom: 20px;
         }
@@ -84,18 +84,25 @@
         .color-grid::-webkit-scrollbar { width: 0; background: transparent; }
 
         .color-card {
-            /* Altura reducida un 60% respecto a la v2 anterior */
             height: 22px; 
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1px solid rgba(128, 128, 128, 0.1);
-            transition: transform 0.1s;
+            transition: all 0.15s;
+            cursor: pointer;
         }
         
-        .color-card:active { transform: scale(0.95); }
-        .color-card.disabled { opacity: 0.1; pointer-events: none; filter: grayscale(1); }
+        /* Iluminación al seleccionar */
+        .color-card.selected {
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+            transform: scale(1.05);
+            z-index: 5;
+        }
+        
+        .color-card.disabled { opacity: 0.05; pointer-events: none; filter: grayscale(1); }
 
         .color-val {
             font-size: 10px;
@@ -126,12 +133,14 @@
         }
 
         .column-title {
-            font-size: 12px; /* Doble del tamaño anterior (6px -> 12px) */
+            font-size: 12px; 
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -0.05em;
             opacity: 0.5;
+            transition: opacity 0.3s;
         }
+        .column-title.hidden-col { opacity: 0; }
     </style>
 </head>
 <body class="theme-dark">
@@ -139,7 +148,7 @@
 <div class="app-container">
     
     <!-- BLOQUE 1: ENCABEZADO (10%) -->
-    <div class="section-header border-b border-gray-500/10">
+    <div class="section-header">
         <div class="flex justify-between items-center mb-1">
             <h1 class="text-[9px] font-black tracking-tighter uppercase italic opacity-80">Resistor Pro Advance</h1>
             <div class="flex gap-1.5 items-center">
@@ -171,40 +180,43 @@
             </div>
             <div id="box-temp" class="glass-panel res-box hidden">
                 <span class="text-[7px] uppercase font-bold opacity-60">PPM</span>
-                <span id="txt-temp" class="text-xl font-black leading-none text-orange-400">100</span>
+                <span id="txt-temp" class="text-xl font-black leading-none text-orange-400">-</span>
             </div>
         </div>
 
-        <div class="flex items-center justify-center">
+        <div class="flex items-center justify-center mt-1">
             <svg viewBox="0 0 300 60" class="w-full h-full max-h-[55px]">
+                <!-- Alambre -->
                 <rect x="0" y="26" width="300" height="8" fill="#64748b" opacity="0.3" />
+                <!-- Cuerpo -->
                 <rect x="60" y="5" width="180" height="50" rx="12" fill="#d2b48c" stroke="rgba(0,0,0,0.1)" />
-                <rect id="v-b1" x="85" y="5" width="12" height="50" fill="#000" />
-                <rect id="v-b2" x="110" y="10" width="10" height="40" fill="#000" />
+                <!-- Bandas -->
+                <rect id="v-b1" x="85" y="5" width="12" height="50" fill="#8B4513" />
+                <rect id="v-b2" x="110" y="10" width="10" height="40" fill="#000000" />
                 <rect id="v-b3" x="135" y="10" width="10" height="40" fill="transparent" class="hidden" />
-                <rect id="v-bm" x="160" y="10" width="10" height="40" fill="#000" />
-                <rect id="v-bt" x="195" y="10" width="12" height="40" fill="#000" />
+                <rect id="v-bm" x="160" y="10" width="10" height="40" fill="#FF8C00" />
+                <rect id="v-bt" x="195" y="10" width="12" height="40" fill="#D4AF37" />
                 <rect id="v-bc" x="220" y="10" width="8" height="40" fill="transparent" class="hidden" />
             </svg>
         </div>
     </div>
 
     <!-- BLOQUE 3: TECLADO (50%) -->
-    <div class="section-keypad mt-2">
+    <div class="section-keypad">
         <div class="grid grid-cols-6 column-gap-6 mb-2 px-1 text-center">
-            <span class="column-title">Dígito 1</span>
-            <span class="column-title">Dígito 2</span>
-            <span id="kb-lbl-d3" class="column-title opacity-10">Dígito 3</span>
-            <span class="column-title">Mult.</span>
-            <span class="column-title">Tol.</span>
-            <span id="kb-lbl-ppm" class="column-title opacity-10">PPM</span>
+            <span class="column-title">BANDA 1</span>
+            <span class="column-title">BANDA 2</span>
+            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
+            <span class="column-title">MULT.</span>
+            <span id="kb-lbl-tol" class="column-title">TOL.</span>
+            <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
         </div>
         <div id="keyboard" class="color-grid flex-grow">
             <!-- JS inyecta aquí 6 botones por cada color -->
         </div>
     </div>
 
-    <!-- BLOQUE 4: ACCIONES -->
+    <!-- BLOQUE 4: ACCIONES (20%) -->
     <div class="section-footer">
         <button class="flex-[3] bg-blue-600 h-12 rounded-xl font-black text-[11px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
             Guardar Medida
@@ -218,21 +230,29 @@
 
 <script>
     const colors = [
-        { name: 'Negro', code: 'c-black', val: 0, mult: 1, tol: null, ppm: null },
-        { name: 'Marrón', code: 'c-brown', val: 1, mult: 10, tol: 1, ppm: 100 },
-        { name: 'Rojo', code: 'c-red', val: 2, mult: 100, tol: 2, ppm: 50 },
-        { name: 'Naranja', code: 'c-orange', val: 3, mult: 1000, tol: null, ppm: 15 },
-        { name: 'Amarillo', code: 'c-yellow', val: 4, mult: 10000, tol: null, ppm: 25 },
-        { name: 'Verde', code: 'c-green', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
-        { name: 'Azul', code: 'c-blue', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
-        { name: 'Violeta', code: 'c-violet', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
-        { name: 'Gris', code: 'c-gray', val: 8, mult: null, tol: 0.05, ppm: 1 },
-        { name: 'Blanco', code: 'c-white', val: 9, mult: null, tol: null, ppm: null },
-        { name: 'Oro', code: 'c-gold', val: null, mult: 0.1, tol: 5, ppm: null },
-        { name: 'Plata', code: 'c-silver', val: null, mult: 0.01, tol: 10, ppm: null }
+        { name: 'Negro', code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: null },
+        { name: 'Marrón', code: 'c-brown', hex: '#8B4513', val: 1, mult: 10, tol: 1, ppm: 100 },
+        { name: 'Rojo', code: 'c-red', hex: '#FF0000', val: 2, mult: 100, tol: 2, ppm: 50 },
+        { name: 'Naranja', code: 'c-orange', hex: '#FF8C00', val: 3, mult: 1000, tol: null, ppm: 15 },
+        { name: 'Amarillo', code: 'c-yellow', hex: '#FFD700', val: 4, mult: 10000, tol: null, ppm: 25 },
+        { name: 'Verde', code: 'c-green', hex: '#008000', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
+        { name: 'Azul', code: 'c-blue', hex: '#0000FF', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
+        { name: 'Violeta', code: 'c-violet', hex: '#EE82EE', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
+        { name: 'Gris', code: 'c-gray', hex: '#808080', val: 8, mult: null, tol: 0.05, ppm: 1 },
+        { name: 'Blanco', code: 'c-white', hex: '#FFFFFF', val: 9, mult: null, tol: null, ppm: null },
+        { name: 'Oro', code: 'c-gold', hex: '#D4AF37', val: null, mult: 0.1, tol: 5, ppm: null },
+        { name: 'Plata', code: 'c-silver', hex: '#C0C0C0', val: null, mult: 0.01, tol: 10, ppm: null }
     ];
 
     let currentBands = 4;
+    let selections = {
+        b1: 1, // Marrón
+        b2: 0, // Negro
+        b3: 0, // Negro
+        mult: 1000, // Naranja
+        tol: 5, // Oro
+        ppm: null
+    };
 
     function initKeyboard() {
         const kb = document.getElementById('keyboard');
@@ -241,13 +261,13 @@
         colors.forEach(c => {
             for(let i=0; i<6; i++) {
                 const btn = document.createElement('div');
-                btn.id = `btn-col-${i}-color-${c.code}`;
+                btn.id = `btn-col-${i}-${c.code}`;
                 btn.className = `color-card ${c.code}`;
                 
                 let displayVal = "-";
                 let isDisabled = false;
 
-                if (i < 3) { // Dígitos 1, 2 y 3
+                if (i < 3) { // Bandas 1, 2 y 3
                     displayVal = c.val !== null ? c.val : "-";
                     if (c.val === null) isDisabled = true;
                 } else if (i === 3) { // Multiplicador
@@ -264,24 +284,81 @@
 
                 if(isDisabled) btn.classList.add('disabled');
 
+                btn.onclick = () => !isDisabled && selectColor(i, c);
                 btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
                 kb.appendChild(btn);
             }
         });
-        updateKeyboardVisuals();
+        updateUI();
     }
 
-    function updateKeyboardVisuals() {
+    function selectColor(colIndex, colorObj) {
+        const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
+        const target = keys[colIndex];
+        
+        selections[target] = (colIndex === 3) ? colorObj.mult : (colIndex === 4 ? colorObj.tol : (colIndex === 5 ? colorObj.ppm : colorObj.val));
+        
+        // Actualizar visual de la resistencia
+        const svgMap = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
+        document.getElementById(svgMap[colIndex]).setAttribute('fill', colorObj.hex);
+        
+        updateUI();
+    }
+
+    function updateUI() {
+        // Actualizar estados "selected" en el teclado
+        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected'));
+        
+        colors.forEach(c => {
+            if (selections.b1 === c.val) document.getElementById(`btn-col-0-${c.code}`)?.classList.add('selected');
+            if (selections.b2 === c.val) document.getElementById(`btn-col-1-${c.code}`)?.classList.add('selected');
+            if (selections.b3 === c.val) document.getElementById(`btn-col-2-${c.code}`)?.classList.add('selected');
+            if (selections.mult === c.mult) document.getElementById(`btn-col-3-${c.code}`)?.classList.add('selected');
+            if (selections.tol === c.tol) document.getElementById(`btn-col-4-${c.code}`)?.classList.add('selected');
+            if (selections.ppm === c.ppm && c.ppm !== null) document.getElementById(`btn-col-5-${c.code}`)?.classList.add('selected');
+        });
+
+        // Actualizar habilitación de columnas según bandas
         for(let color of colors) {
-            const btnD3 = document.getElementById(`btn-col-2-color-${color.code}`);
-            const btnPPM = document.getElementById(`btn-col-5-color-${color.code}`);
+            const btnD3 = document.getElementById(`btn-col-2-${color.code}`);
+            const btnTol = document.getElementById(`btn-col-4-${color.code}`);
+            const btnPPM = document.getElementById(`btn-col-5-${color.code}`);
             
+            // Banda 3 se activa solo en 5B y 6B
             if (currentBands < 5) btnD3.classList.add('disabled');
             else if (color.val !== null) btnD3.classList.remove('disabled');
 
+            // Tolerancia se desactiva en 3B
+            if (currentBands === 3) btnTol.classList.add('disabled');
+            else if (color.tol !== null) btnTol.classList.remove('disabled');
+
+            // PPM se activa solo en 6B
             if (currentBands < 6) btnPPM.classList.add('disabled');
             else if (color.ppm !== null) btnPPM.classList.remove('disabled');
         }
+
+        calculateResult();
+    }
+
+    function calculateResult() {
+        let baseValue = 0;
+        if (currentBands < 5) {
+            baseValue = (selections.b1 * 10) + selections.b2;
+        } else {
+            baseValue = (selections.b1 * 100) + (selections.b2 * 10) + selections.b3;
+        }
+
+        const total = baseValue * selections.mult;
+        
+        // Formateo
+        let formatted = "";
+        if (total >= 1000000) formatted = (total/1000000).toFixed(total % 1000000 === 0 ? 0 : 2) + "M";
+        else if (total >= 1000) formatted = (total/1000).toFixed(total % 1000 === 0 ? 0 : 2) + "k";
+        else formatted = total.toFixed(total % 1 === 0 ? 0 : 2);
+
+        document.getElementById('txt-val').innerText = formatted + " Ω";
+        document.getElementById('txt-tol').innerText = (currentBands === 3 ? "±20%" : "±" + selections.tol + "%");
+        document.getElementById('txt-temp').innerText = (selections.ppm || "-");
     }
 
     function setTheme(theme) {
@@ -300,32 +377,34 @@
         document.getElementById('btn-' + n + 'b').classList.add('active');
         
         const b3 = document.getElementById('v-b3');
+        const bt = document.getElementById('v-bt');
         const bc = document.getElementById('v-bc');
         const boxTemp = document.getElementById('box-temp');
+        
         const lblD3 = document.getElementById('kb-lbl-d3');
+        const lblTol = document.getElementById('kb-lbl-tol');
         const lblPPM = document.getElementById('kb-lbl-ppm');
 
-        if(n >= 5) {
-            b3.classList.remove('hidden');
-            lblD3.classList.remove('opacity-10');
-        } else {
-            b3.classList.add('hidden');
-            lblD3.classList.add('opacity-10');
-        }
+        // Visibilidad en Imagen
+        b3.classList.toggle('hidden', n < 5);
+        bt.classList.toggle('hidden', n === 3);
+        bc.classList.toggle('hidden', n < 6);
+        
+        // Visibilidad en Resultados
+        boxTemp.classList.toggle('hidden', n < 6);
 
-        if(n == 6) {
-            bc.classList.remove('hidden');
-            boxTemp.classList.remove('hidden');
-            lblPPM.classList.remove('opacity-10');
-        } else {
-            bc.classList.add('hidden');
-            boxTemp.classList.add('hidden');
-            lblPPM.classList.add('opacity-10');
-        }
-        updateKeyboardVisuals();
+        // Visibilidad en Títulos de Teclado
+        lblD3.classList.toggle('hidden-col', n < 5);
+        lblTol.classList.toggle('hidden-col', n === 3);
+        lblPPM.classList.toggle('hidden-col', n < 6);
+
+        updateUI();
     }
 
-    window.onload = initKeyboard;
+    window.onload = () => {
+        initKeyboard();
+        setBands(4); // Iniciar en 4 bandas por defecto
+    };
 </script>
 
 </body>
