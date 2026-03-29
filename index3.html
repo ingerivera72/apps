@@ -33,10 +33,11 @@
         }
 
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
-        /* Reducción de altura en la sección de display */
         .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
-        .section-keypad  { height: 63%; display: flex; flex-direction: column; }
-        .section-footer  { height: 12%; display: flex; align-items: center; gap: 12px; }
+        /* Bloque 3: 55% */
+        .section-keypad  { height: 55%; display: flex; flex-direction: column; }
+        /* Bloque 4: 20% */
+        .section-footer  { height: 20%; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
 
         .glass-panel {
             background: rgba(0, 0, 0, 0.05);
@@ -60,12 +61,10 @@
             column-gap: 6px; 
             row-gap: 3px;
             flex-grow: 1;
-            /* Reducción del 50% en la separación superior respecto a los labels */
             margin-top: 2px; 
         }
 
         .color-card {
-            /* Reducción de 2px adicionales en vertical */
             height: calc(100% - 4px); 
             min-height: 20px;
             border-radius: 4px;
@@ -106,10 +105,10 @@
         .c-green  { background-color: #166534; color: white; }
         .c-blue   { background-color: #1e40af; color: white; }
         .c-violet { background-color: #7c3aed; color: white; }
-        .c-gray   { background-color: #64748b; color: white; } /* Gris un poco más claro */
+        .c-gray   { background-color: #64748b; color: white; }
         .c-white  { background-color: #ffffff; color: black; }
         .c-gold   { background-color: #b8860b; color: white; }
-        .c-silver { background-color: #cbd5e1; color: #1e293b; } /* Plata un poco más oscuro */
+        .c-silver { background-color: #cbd5e1; color: #1e293b; }
 
         .column-title {
             font-size: 8px; 
@@ -168,15 +167,16 @@
         </div>
 
         <div class="h-1/2 flex items-center justify-center">
-            <svg viewBox="0 0 300 60" class="w-full h-8">
-                <rect x="0" y="27" width="300" height="6" fill="#94a3b8" opacity="0.4" />
-                <rect x="60" y="10" width="180" height="40" rx="10" fill="#d2b48c" />
-                <rect id="v-b1" x="85" y="10" width="12" height="40" fill="#5d2e0a" />
-                <rect id="v-b2" x="110" y="10" width="10" height="40" fill="#000000" />
-                <rect id="v-b3" x="135" y="10" width="10" height="40" fill="transparent" class="hidden" />
-                <rect id="v-bm" x="160" y="10" width="10" height="40" fill="#ea580c" />
-                <rect id="v-bt" x="195" y="10" width="12" height="40" fill="#b8860b" />
-                <rect id="v-bc" x="220" y="10" width="8" height="40" fill="transparent" class="hidden" />
+            <!-- Resistencia aumentada en escala para ver mejor las bandas -->
+            <svg viewBox="0 0 300 70" class="w-full h-10">
+                <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
+                <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
+                <rect id="v-b1" x="80" y="5" width="16" height="60" fill="#5d2e0a" />
+                <rect id="v-b2" x="110" y="5" width="14" height="60" fill="#000000" />
+                <rect id="v-b3" x="140" y="5" width="14" height="60" fill="transparent" class="hidden" />
+                <rect id="v-bm" x="170" y="5" width="14" height="60" fill="#ea580c" />
+                <rect id="v-bt" x="210" y="5" width="16" height="60" fill="#b8860b" />
+                <rect id="v-bc" x="238" y="5" width="10" height="60" fill="transparent" class="hidden" />
             </svg>
         </div>
     </div>
@@ -194,16 +194,13 @@
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- ACCIONES FINALES -->
+    <!-- ACCIONES FINALES (Sin texto institucional) -->
     <div class="section-footer">
-        <div class="flex-1 flex flex-col">
-            <span class="text-[8px] font-bold opacity-50 ml-2 mb-1 uppercase">FES Aragón - UNAM</span>
-            <button class="w-full bg-blue-600 h-10 rounded-xl font-black text-[10px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
-                Guardar Captura
-            </button>
-        </div>
-        <button onclick="location.reload()" class="w-12 h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg active:scale-90 border border-white/5">
-            🔄
+        <button class="w-full bg-blue-600 h-12 rounded-xl font-black text-[12px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
+            Guardar Captura
+        </button>
+        <button onclick="location.reload()" class="w-full h-10 bg-white/10 rounded-xl flex items-center justify-center text-lg active:scale-90 border border-white/5">
+            🔄 Reiniciar
         </button>
     </div>
 
@@ -248,21 +245,38 @@
                 kb.appendChild(btn);
             }
         });
+        updateVisuals();
         updateUI();
     }
 
     function selectColor(col, color, event) {
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
-        const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
-        
         if (col < 3 && color.val === null) return;
         if (col === 3 && color.mult === null) return;
         if (col === 4 && color.tol === null) return;
         if (col === 5 && color.ppm === null) return;
 
         selections[keys[col]] = (col === 3) ? color.mult : (col === 4 ? color.tol : (col === 5 ? color.ppm : color.val));
-        document.getElementById(svgIds[col]).setAttribute('fill', color.hex);
+        updateVisuals();
         updateUI();
+    }
+
+    function updateVisuals() {
+        const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
+        const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
+        
+        keys.forEach((key, idx) => {
+            const val = selections[key];
+            let colorObj;
+            if (key === 'mult') colorObj = colors.find(c => c.mult === val);
+            else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
+            else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
+            else colorObj = colors.find(c => c.val === val);
+            
+            if (colorObj) {
+                document.getElementById(svgIds[idx]).setAttribute('fill', colorObj.hex);
+            }
+        });
     }
 
     function updateUI() {
@@ -305,15 +319,26 @@
 
     function setBands(n) {
         currentBands = n;
+        
+        // Valores por defecto al habilitar nuevas bandas:
+        // Banda 3 en "0", Tolerancia en "5%", PPM en café (100)
+        if (n >= 5) selections.b3 = 0;
+        if (n >= 4) selections.tol = 5;
+        if (n === 6) selections.ppm = 100;
+
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+n+'b').classList.add('active');
+        
         document.getElementById('v-b3').classList.toggle('hidden', n < 5);
         document.getElementById('v-bt').classList.toggle('hidden', n === 3);
         document.getElementById('v-bc').classList.toggle('hidden', n < 6);
         document.getElementById('box-temp').classList.toggle('hidden', n < 6);
+        
         document.getElementById('kb-lbl-d3').classList.toggle('hidden-col', n < 5);
         document.getElementById('kb-lbl-tol').classList.toggle('hidden-col', n === 3);
         document.getElementById('kb-lbl-ppm').classList.toggle('hidden-col', n < 6);
+        
+        updateVisuals();
         updateUI();
     }
 
