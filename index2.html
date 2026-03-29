@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resistor PRO</title>
+    
+    <!-- PWA Settings para modo Aplicación -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Inline Manifest para forzar el modo App -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlJlc2lzdG9yIE1hc3RlciBQUk8iLAogICJzaG9ydF9uYW1lIjogIlJlc2lzdG9yIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAidmVyc2lvbiI6ICIxLjAuMSIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMGYxNzJhIiwKICAidGhlbWVfY29sb3IiOiAiIzBmMTcyYSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzkxMS85MTE0NDAucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciLAogICAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgICB9CiAgXQp9">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden; /* Evita el scroll global */
+            height: 100vh;
+            width: 100vw;
+        }
+
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --accent: #3b82f6;
+            --resistor-color: #d2b48c;
+            --border-color: #e2e8f0;
+        }
+
+        [data-theme='dark'] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --accent: #60a5fa;
+            --resistor-color: #c4a47c;
+            --border-color: #334155;
+        }
+
+        body { background-color: var(--bg-main); color: var(--text-main); }
+        .app-container { 
+            background-color: var(--bg-card); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* Ajuste para que todo quepa sin scroll */
+        .color-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            height: 34px; /* Más compacto */
+            font-size: 14px;
+        }
+
+        .color-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .custom-table {
+            border-spacing: 4px 2px;
+            border-collapse: separate;
+            table-layout: fixed;
+        }
+
+        .resistor-svg {
+            max-height: 80px;
+        }
+
+        /* Estilo para los botones de bandas */
+        .band-btn {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="app-container w-full max-w-md mx-auto overflow-hidden shadow-2xl">
+    <!-- Header Muy Compacto -->
+    <div class="bg-slate-900 px-4 py-2 text-white flex justify-between items-center">
+        <h1 class="text-xs font-black tracking-tighter uppercase">Resistor PRO</h1>
+        <div class="flex gap-1">
+            <button onclick="setBands(3)" id="btn-3" class="band-btn rounded bg-white/10">3B</button>
+            <button onclick="setBands(4)" id="btn-4" class="band-btn rounded bg-blue-600">4B</button>
+            <button onclick="setBands(5)" id="btn-5" class="band-btn rounded bg-white/10">5B</button>
+            <button onclick="setBands(6)" id="btn-6" class="band-btn rounded bg-white/10">6B</button>
+        </div>
+    </div>
+
+    <!-- Resultados Visuales -->
+    <div class="p-2 grid grid-cols-2 gap-2 text-center bg-slate-800/50">
+        <div>
+            <span class="text-[8px] uppercase opacity-50 block font-bold">Resistencia</span>
+            <p id="display-resistance" class="text-xl font-black text-blue-400">0 Ω</p>
+        </div>
+        <div>
+            <span class="text-[8px] uppercase opacity-50 block font-bold">Tolerancia</span>
+            <p id="display-tolerance" class="text-xl font-black text-emerald-400">±0%</p>
+        </div>
+    </div>
+
+    <!-- El Resistor SVG -->
+    <div class="py-2 flex justify-center bg-black/10">
+        <svg viewBox="0 0 350 100" class="resistor-svg w-full px-4">
+            <rect x="0" y="46" width="350" height="8" fill="#64748b" />
+            <path d="M70 30 Q70 15 95 15 L255 15 Q280 15 280 30 L280 70 Q280 85 255 85 L95 85 Q70 85 70 70 Z" fill="var(--resistor-color)" />
+            <rect id="v-band-1" x="95" y="15" width="14" height="70" fill="#8B4513" />
+            <rect id="v-band-2" x="125" y="18" width="12" height="64" fill="#000" />
+            <rect id="v-band-3" x="155" y="18" width="12" height="64" fill="#000" class="opacity-0" />
+            <rect id="v-band-mult" x="185" y="18" width="12" height="64" fill="#FF0000" />
+            <rect id="v-band-tol" x="225" y="18" width="12" height="64" fill="#D4AF37" />
+            <rect id="v-band-temp" x="255" y="15" width="14" height="70" fill="transparent" class="opacity-0" />
+        </svg>
+    </div>
+
+    <!-- Teclado de Selección (Ocupa el resto de la pantalla) -->
+    <div class="flex-1 overflow-hidden p-1">
+        <table class="w-full custom-table h-full">
+            <thead>
+                <tr class="text-[8px] uppercase opacity-40 font-black">
+                    <th>B1</th><th>B2</th><th id="th-band-3" class="opacity-10">B3</th><th>Mult</th><th>Tol</th>
+                </tr>
+            </thead>
+            <tbody id="color-grid"></tbody>
+        </table>
+    </div>
+
+    <!-- Panel Inferior de Validación (Más pequeño) -->
+    <div class="p-3 bg-slate-900 text-white">
+        <div class="flex gap-2 items-center">
+            <input type="number" id="measured-value" placeholder="Medida..." class="w-full bg-slate-800 p-2 rounded-lg text-sm border border-slate-700 outline-none">
+            <select id="measured-unit" class="bg-slate-800 p-2 rounded-lg text-sm font-bold border border-slate-700">
+                <option value="1">Ω</option>
+                <option value="1000">k</option>
+                <option value="1000000">M</option>
+            </select>
+            <div id="status-box" class="px-2 py-2 rounded-lg text-[10px] font-black border border-dashed border-white/20 text-center min-w-[70px]">
+                OK?
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const COLORS = [
+        { id: 'black', hex: '#000000', text: 'white', val: 0, mult: 1, tol: null },
+        { id: 'brown', hex: '#8B4513', text: 'white', val: 1, mult: 10, tol: 1 },
+        { id: 'red', hex: '#FF0000', text: 'white', val: 2, mult: 100, tol: 2 },
+        { id: 'orange', hex: '#FFA500', text: 'black', val: 3, mult: 1000, tol: null },
+        { id: 'yellow', hex: '#FFFF00', text: 'black', val: 4, mult: 10000, tol: null },
+        { id: 'green', hex: '#008000', text: 'white', val: 5, mult: 100000, tol: 0.5 },
+        { id: 'blue', hex: '#0000FF', text: 'white', val: 6, mult: 1000000, tol: 0.25 },
+        { id: 'violet', hex: '#9400D3', text: 'white', val: 7, mult: 10000000, tol: 0.1 },
+        { id: 'gray', hex: '#808080', text: 'white', val: 8, mult: null, tol: 0.05 },
+        { id: 'white', hex: '#FFFFFF', text: 'black', val: 9, mult: null, tol: null },
+        { id: 'gold', hex: '#D4AF37', text: 'black', val: null, mult: 0.1, tol: 5 },
+        { id: 'silver', hex: '#C0C0C0', text: 'black', val: null, mult: 0.01, tol: 10 }
+    ];
+
+    let currentBands = 4;
+    let selections = { band1: 1, band2: 0, band3: 0, mult: 10, tol: 5 };
+
+    function init() {
+        setBands(4);
+        document.getElementById('measured-value').addEventListener('input', validateValue);
+        document.getElementById('measured-unit').addEventListener('change', validateValue);
+    }
+
+    function setBands(num) {
+        currentBands = num;
+        document.querySelectorAll('.band-btn').forEach(b => b.classList.replace('bg-blue-600', 'bg-white/10'));
+        document.getElementById(`btn-${num}`).classList.replace('bg-white/10', 'bg-blue-600');
+        
+        document.getElementById('th-band-3').style.opacity = num >= 5 ? "1" : "0.1";
+        document.getElementById('v-band-3').style.opacity = num >= 5 ? "1" : "0";
+        
+        renderTable();
+        updateUI();
+    }
+
+    function renderTable() {
+        const grid = document.getElementById('color-grid');
+        grid.innerHTML = '';
+        COLORS.forEach((color) => {
+            const tr = document.createElement('tr');
+            tr.appendChild(createCell(color, 'band1', color.val));
+            tr.appendChild(createCell(color, 'band2', color.val));
+            tr.appendChild(createCell(color, 'band3', color.val, currentBands < 5));
+            tr.appendChild(createCell(color, 'mult', color.mult));
+            tr.appendChild(createCell(color, 'tol', color.tol, currentBands < 4));
+            grid.appendChild(tr);
+        });
+    }
+
+    function createCell(color, type, val, disabled = false) {
+        const td = document.createElement('td');
+        if (val === null) return td;
+        const div = document.createElement('div');
+        div.className = `color-card rounded-md flex items-center justify-center font-bold ${disabled ? 'opacity-0 pointer-events-none' : ''}`;
+        div.style.backgroundColor = color.hex;
+        div.style.color = color.text;
+        
+        let label = val;
+        if (type === 'mult') label = val >= 1000 ? (val/1000)+'k' : (val < 1 ? val : 'x'+val);
+        if (type === 'tol') label = val + '%';
+        div.innerText = label;
+
+        const isSel = (type === 'mult' || type === 'tol') ? color[type] === selections[type] : color.val === selections[type];
+        if (isSel && !disabled) {
+            div.classList.add('active');
+            const map = { band1: 'v-band-1', band2: 'v-band-2', band3: 'v-band-3', mult: 'v-band-mult', tol: 'v-band-tol' };
+            document.getElementById(map[type]).setAttribute('fill', color.hex);
+        }
+
+        div.onclick = () => { 
+            selections[type] = (type === 'mult' || type === 'tol') ? color[type] : color.val; 
+            renderTable(); updateUI(); 
+        };
+        td.appendChild(div); return td;
+    }
+
+    function updateUI() {
+        let res = (currentBands <= 4) ? (selections.band1 * 10 + selections.band2) * (selections.mult || 1) : (selections.band1 * 100 + selections.band2 * 10 + selections.band3) * (selections.mult || 1);
+        document.getElementById('display-resistance').innerText = format(res);
+        document.getElementById('display-tolerance').innerText = `±${currentBands === 3 ? 20 : (selections.tol || 20)}%`;
+        validateValue();
+    }
+
+    function format(n) {
+        if (n >= 1e6) return (n/1e6).toFixed(1) + ' MΩ';
+        if (n >= 1e3) return (n/1e3).toFixed(1) + ' kΩ';
+        return n.toFixed(1) + ' Ω';
+    }
+
+    function validateValue() {
+        const inp = document.getElementById('measured-value');
+        const m = parseFloat(inp.value) * parseFloat(document.getElementById('measured-unit').value);
+        if (isNaN(m)) return;
+        let theo = (currentBands <= 4) ? (selections.band1 * 10 + selections.band2) * (selections.mult || 1) : (selections.band1 * 100 + selections.band2 * 10 + selections.band3) * (selections.mult || 1);
+        const tol = (currentBands === 3 ? 20 : selections.tol) / 100;
+        const ok = m >= theo*(1-tol) && m <= theo*(1+tol);
+        const box = document.getElementById('status-box');
+        box.innerText = ok ? "CORRECTO" : "ERROR";
+        box.style.color = ok ? "#10b981" : "#ef4444";
+        box.style.borderColor = ok ? "#10b981" : "#ef4444";
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
