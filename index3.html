@@ -29,13 +29,13 @@
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding-left: 16px;
-            padding-right: 16px;
+            padding-left: 12px;
+            padding-right: 12px;
             padding-top: env(safe-area-inset-top, 20px);
             padding-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* Redistribución de Alturas Final */
+        /* Redistribución de Alturas */
         .section-header  { height: 15%; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
         .section-display { height: 20%; display: flex; flex-direction: column; justify-content: space-evenly; padding: 4px 0; }
         .section-keypad  { height: 45%; display: flex; flex-direction: column; overflow: hidden; }
@@ -51,8 +51,8 @@
         body.theme-dark .glass-panel { background: rgba(255, 255, 255, 0.05); }
 
         .theme-dot {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -62,58 +62,56 @@
 
         .band-btn {
             flex: 1;
-            padding: 6px 0;
-            font-size: 10px;
+            padding: 4px 0;
+            font-size: 9px;
             font-weight: 900;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.2s;
             color: inherit;
             opacity: 0.6;
         }
         .band-btn.active { background: #3b82f6; color: white; opacity: 1; }
 
-        /* Estilos del Teclado de Colores */
+        /* Estilos del Teclado de Colores Reducidos */
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
             overflow-y: auto;
-            padding-right: 4px;
+            padding-bottom: 20px;
         }
         
-        /* Ocultar barra de scroll pero permitir scroll */
         .color-grid::-webkit-scrollbar { width: 0; background: transparent; }
 
         .color-card {
-            aspect-ratio: 1/1.1;
-            border-radius: 12px;
+            aspect-ratio: 1/1.3;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
-            border: 2px solid rgba(128, 128, 128, 0.1);
-            transition: transform 0.1s, border-color 0.2s;
+            border: 1px solid rgba(128, 128, 128, 0.1);
+            transition: transform 0.1s;
         }
         
         .color-card:active { transform: scale(0.9); }
-        .color-card.selected { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+        .color-card.disabled { opacity: 0.15; pointer-events: none; grayscale: 100%; }
 
         .color-val {
-            font-size: 16px;
+            font-size: 11px;
             font-weight: 900;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.4);
         }
 
         .color-name {
-            font-size: 7px;
+            font-size: 5px;
             font-weight: 700;
             text-transform: uppercase;
-            margin-top: 2px;
-            opacity: 0.8;
+            margin-top: 1px;
+            opacity: 0.7;
         }
 
-        /* Colores específicos de las bandas */
+        /* Colores de las bandas */
         .c-black { background-color: #000000; color: white; }
         .c-brown { background-color: #8B4513; color: white; }
         .c-red   { background-color: #FF0000; color: white; }
@@ -140,11 +138,11 @@
 
 <div class="app-container">
     
-    <!-- BLOQUE 1: ENCABEZADO (15%) -->
+    <!-- BLOQUE 1: ENCABEZADO -->
     <div class="section-header border-b border-gray-500/10">
         <div class="flex justify-between items-center">
-            <h1 class="text-[12px] font-black tracking-tighter uppercase italic">Resistor Pro Advance</h1>
-            <div class="glass-panel flex gap-2 items-center">
+            <h1 class="text-[10px] font-black tracking-tighter uppercase italic">Resistor Pro Advance</h1>
+            <div class="glass-panel flex gap-1.5 items-center">
                 <div onclick="setTheme('dark')" class="theme-dot bg-slate-900 active" title="Oscuro"></div>
                 <div onclick="setTheme('light')" class="theme-dot bg-white" title="Claro"></div>
                 <div onclick="setTheme('blue')" class="theme-dot bg-sky-500" title="Azul"></div>
@@ -160,25 +158,25 @@
         </div>
     </div>
 
-    <!-- BLOQUE 2: RESULTADOS Y GRÁFICO (20%) -->
+    <!-- BLOQUE 2: RESULTADOS Y GRÁFICO -->
     <div class="section-display">
         <div class="flex gap-2">
             <div class="glass-panel res-box">
-                <span class="text-[7px] uppercase font-bold opacity-60">Valor</span>
-                <span id="txt-val" class="text-xl font-black leading-none tracking-tighter">10k Ω</span>
+                <span class="text-[6px] uppercase font-bold opacity-60">Valor</span>
+                <span id="txt-val" class="text-lg font-black leading-none tracking-tighter">10k Ω</span>
             </div>
             <div class="glass-panel res-box">
-                <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
-                <span id="txt-tol" class="text-xl font-black leading-none text-emerald-500">±5%</span>
+                <span class="text-[6px] uppercase font-bold opacity-60">Tolerancia</span>
+                <span id="txt-tol" class="text-lg font-black leading-none text-emerald-500">±5%</span>
             </div>
             <div id="box-temp" class="glass-panel res-box hidden">
-                <span class="text-[7px] uppercase font-bold opacity-60">PPM</span>
-                <span id="txt-temp" class="text-xl font-black leading-none text-orange-400">100</span>
+                <span class="text-[6px] uppercase font-bold opacity-60">PPM</span>
+                <span id="txt-temp" class="text-lg font-black leading-none text-orange-400">100</span>
             </div>
         </div>
 
         <div class="flex items-center justify-center pt-2">
-            <svg viewBox="0 0 300 80" class="w-full h-full max-h-[75px]">
+            <svg viewBox="0 0 300 80" class="w-full h-full max-h-[70px]">
                 <rect x="0" y="36" width="300" height="8" fill="#64748b" opacity="0.3" />
                 <rect x="60" y="10" width="180" height="60" rx="15" fill="#d2b48c" stroke="rgba(0,0,0,0.1)" />
                 <rect id="v-b1" x="85" y="10" width="12" height="60" fill="#000" />
@@ -191,25 +189,27 @@
         </div>
     </div>
 
-    <!-- BLOQUE 3: TECLADO DE COLORES (45%) -->
+    <!-- BLOQUE 3: TECLADO DE COLORES (6 COLUMNAS) -->
     <div class="section-keypad">
-        <div class="grid grid-cols-4 gap-2 mb-2 px-1 text-center font-black text-[8px] opacity-40 uppercase tracking-widest">
-            <span>Dig 1</span>
-            <span>Dig 2</span>
-            <span id="lbl-b3">Mult</span>
-            <span>Tol</span>
+        <div class="grid grid-cols-6 gap-1 mb-1 px-1 text-center font-black text-[6px] opacity-40 uppercase tracking-tighter">
+            <span>D1</span>
+            <span>D2</span>
+            <span id="kb-lbl-d3" class="opacity-20">D3</span>
+            <span>MUL</span>
+            <span>TOL</span>
+            <span id="kb-lbl-ppm" class="opacity-20">PPM</span>
         </div>
         <div id="keyboard" class="color-grid flex-grow">
-            <!-- Los botones se generarán con JS para mayor limpieza -->
+            <!-- JS inyecta aquí 6 botones por cada color -->
         </div>
     </div>
 
-    <!-- BLOQUE 4: ACCIONES (20%) -->
+    <!-- BLOQUE 4: ACCIONES -->
     <div class="section-footer">
-        <button class="flex-[3] bg-blue-600 h-16 rounded-3xl font-black text-[12px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
+        <button class="flex-[3] bg-blue-600 h-14 rounded-2xl font-black text-[10px] text-white shadow-lg active:scale-95 uppercase tracking-widest">
             Guardar Medida
         </button>
-        <button class="flex-1 bg-slate-800 h-16 rounded-3xl flex items-center justify-center text-2xl active:scale-95 border border-white/5">
+        <button class="flex-1 bg-slate-800 h-14 rounded-2xl flex items-center justify-center text-xl active:scale-95 border border-white/5">
             🔦
         </button>
     </div>
@@ -218,7 +218,7 @@
 
 <script>
     const colors = [
-        { name: 'Negro', code: 'c-black', val: 0, mult: 1, tol: null },
+        { name: 'Negro', code: 'c-black', val: 0, mult: 1, tol: null, ppm: null },
         { name: 'Marrón', code: 'c-brown', val: 1, mult: 10, tol: 1, ppm: 100 },
         { name: 'Rojo', code: 'c-red', val: 2, mult: 100, tol: 2, ppm: 50 },
         { name: 'Naranja', code: 'c-orange', val: 3, mult: 1000, tol: null, ppm: 15 },
@@ -232,25 +232,56 @@
         { name: 'Plata', code: 'c-silver', val: null, mult: 0.01, tol: 10, ppm: null }
     ];
 
+    let currentBands = 4;
+
     function initKeyboard() {
         const kb = document.getElementById('keyboard');
         kb.innerHTML = '';
         
         colors.forEach(c => {
-            // Fila de botones (uno por cada columna lógica)
-            for(let i=0; i<4; i++) {
+            for(let i=0; i<6; i++) {
                 const btn = document.createElement('div');
+                btn.id = `btn-col-${i}-color-${c.code}`;
                 btn.className = `color-card ${c.code}`;
                 
-                let displayVal = "";
-                if(i < 2) displayVal = c.val !== null ? c.val : "-";
-                else if(i === 2) displayVal = c.mult !== null ? "x" + (c.mult < 1 ? c.mult : c.mult.toString().charAt(0) + "0^" + (c.mult.toString().length-1)) : "-";
-                else displayVal = c.tol !== null ? c.tol + "%" : "-";
+                let displayVal = "-";
+                let isDisabled = false;
 
-                btn.innerHTML = `<span class="color-val">${displayVal}</span><span class="color-name">${c.name.substring(0,3)}</span>`;
+                if (i < 3) { // Dígitos 1, 2 y 3
+                    displayVal = c.val !== null ? c.val : "-";
+                    if (c.val === null) isDisabled = true;
+                } else if (i === 3) { // Multiplicador
+                    if (c.mult !== null) {
+                        displayVal = c.mult < 1 ? c.mult : (c.mult >= 1000 ? (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult/1000)+"k") : c.mult);
+                    } else isDisabled = true;
+                } else if (i === 4) { // Tolerancia
+                    displayVal = c.tol !== null ? c.tol + "%" : "-";
+                    if (c.tol === null) isDisabled = true;
+                } else { // PPM
+                    displayVal = c.ppm !== null ? c.ppm : "-";
+                    if (c.ppm === null) isDisabled = true;
+                }
+
+                if(isDisabled) btn.classList.add('disabled');
+
+                btn.innerHTML = `<span class="color-val">${displayVal}</span><span class="color-name">${c.name.substring(0,2)}</span>`;
                 kb.appendChild(btn);
             }
         });
+        updateKeyboardVisuals();
+    }
+
+    function updateKeyboardVisuals() {
+        for(let color of colors) {
+            const btnD3 = document.getElementById(`btn-col-2-color-${color.code}`);
+            const btnPPM = document.getElementById(`btn-col-5-color-${color.code}`);
+            
+            if (currentBands < 5) btnD3.classList.add('disabled');
+            else if (color.val !== null) btnD3.classList.remove('disabled');
+
+            if (currentBands < 6) btnPPM.classList.add('disabled');
+            else if (color.ppm !== null) btnPPM.classList.remove('disabled');
+        }
     }
 
     function setTheme(theme) {
@@ -264,29 +295,34 @@
     }
 
     function setBands(n) {
+        currentBands = n;
         document.querySelectorAll('.band-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('btn-' + n + 'b').classList.add('active');
         
         const b3 = document.getElementById('v-b3');
         const bc = document.getElementById('v-bc');
         const boxTemp = document.getElementById('box-temp');
-        const lblB3 = document.getElementById('lbl-b3');
+        const lblD3 = document.getElementById('kb-lbl-d3');
+        const lblPPM = document.getElementById('kb-lbl-ppm');
 
         if(n >= 5) {
             b3.classList.remove('hidden');
-            lblB3.innerText = "Dig 3";
+            lblD3.classList.remove('opacity-20');
         } else {
             b3.classList.add('hidden');
-            lblB3.innerText = "Mult";
+            lblD3.classList.add('opacity-20');
         }
 
         if(n == 6) {
             bc.classList.remove('hidden');
             boxTemp.classList.remove('hidden');
+            lblPPM.classList.remove('opacity-20');
         } else {
             bc.classList.add('hidden');
             boxTemp.classList.add('hidden');
+            lblPPM.classList.add('opacity-20');
         }
+        updateKeyboardVisuals();
     }
 
     window.onload = initKeyboard;
