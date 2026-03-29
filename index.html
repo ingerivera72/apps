@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resistor Master - Lector de Bandas</title>
+    
+    <!-- Configuración PWA Reforzada -->
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Resistor PRO">
+    
+    <!-- Manifiesto en línea para forzar detección de PWA -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJnameIjogIlJlc2lzdG9yIE1hc3RlciBQUk8iLAogICJzaG9ydF9uYW1lIjogIlJlc2lzdG9yIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAidmVyc2lvbiI6ICIxLjAuMCIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBmMTcyYSIsCiAgInRoZW1lX2NvbG9yIjogIiMwZjE3MmEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi85MTEvOTExNDQwLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --accent: #3b82f6;
+            --resistor-color: #d2b48c;
+            --border-color: #e2e8f0;
+            --card-sub: rgba(0,0,0,0.05);
+        }
+
+        [data-theme='dark'] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --accent: #60a5fa;
+            --resistor-color: #c4a47c;
+            --border-color: #334155;
+            --card-sub: rgba(255,255,255,0.05);
+        }
+
+        [data-theme='blue'] {
+            --bg-main: #0c4a6e;
+            --bg-card: #075985;
+            --text-main: #e0f2fe;
+            --accent: #38bdf8;
+            --resistor-color: #d2b48c;
+            --border-color: #0c4a6e;
+            --card-sub: rgba(255,255,255,0.1);
+        }
+
+        [data-theme='pink'] {
+            --bg-main: #831843;
+            --bg-card: #9d174d;
+            --text-main: #fdf2f8;
+            --accent: #f472b6;
+            --resistor-color: #d2b48c;
+            --border-color: #831843;
+            --card-sub: rgba(255,255,255,0.1);
+        }
+
+        body { background-color: var(--bg-main); color: var(--text-main); }
+        .app-container { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-main); }
+        .resistor-body { fill: var(--resistor-color); }
+        .bg-sub { background-color: var(--card-sub); }
+
+        .color-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .color-card:hover { transform: translateY(-2px); }
+        
+        .color-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent), inset 0 0 0 2px rgba(255,255,255,0.3);
+            transform: scale(1.15);
+            z-index: 20;
+            outline: 3px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .band-transition { transition: fill 0.3s ease, opacity 0.3s ease; }
+
+        input, select {
+            background-color: var(--bg-main) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border-color) !important;
+            appearance: none;
+        }
+
+        .input-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; color: #b12c2c !important; }
+        .input-success { border-color: #22c55e !important; background-color: #f0fdf4 !important; color: #166534 !important; }
+        
+        .custom-table {
+            border-spacing: 14px 5px; 
+            border-collapse: separate;
+        }
+
+        @media (display-mode: standalone) {
+            body { padding: 0; margin: 0; }
+            .app-container { border-radius: 0; min-height: 100vh; border: none; }
+        }
+    </style>
+</head>
+<body class="p-0 md:p-8" data-theme="light">
+
+<div class="max-w-4xl mx-auto app-container md:rounded-3xl shadow-2xl overflow-hidden border transition-colors duration-500 min-h-screen md:min-h-0">
+    <!-- Header -->
+    <div class="bg-slate-900 p-6 text-white text-center">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <h1 class="text-xl font-bold tracking-tight">RESISTOR MASTER PRO</h1>
+            <div class="flex gap-3 bg-white/10 p-2 rounded-full backdrop-blur-sm">
+                <button onclick="setTheme('light')" class="w-6 h-6 rounded-full bg-white border border-gray-300 hover:scale-125 transition"></button>
+                <button onclick="setTheme('dark')" class="w-6 h-6 rounded-full bg-slate-800 border border-slate-600 hover:scale-125 transition"></button>
+                <button onclick="setTheme('blue')" class="w-6 h-6 rounded-full bg-sky-500 border border-white hover:scale-125 transition"></button>
+                <button onclick="setTheme('pink')" class="w-6 h-6 rounded-full bg-pink-500 border border-white hover:scale-125 transition"></button>
+            </div>
+        </div>
+        
+        <div class="flex justify-center gap-2 flex-wrap">
+            <button onclick="setBands(3)" id="btn-3" class="band-btn px-4 py-2 rounded-xl bg-white/10 hover:bg-blue-600 transition text-sm font-semibold">3 Bandas</button>
+            <button onclick="setBands(4)" id="btn-4" class="band-btn px-4 py-2 rounded-xl bg-blue-600 font-bold text-sm">4 Bandas</button>
+            <button onclick="setBands(5)" id="btn-5" class="band-btn px-4 py-2 rounded-xl bg-white/10 hover:bg-blue-600 transition text-sm font-semibold">5 Bandas</button>
+            <button onclick="setBands(6)" id="btn-6" class="band-btn px-4 py-2 rounded-xl bg-white/10 hover:bg-blue-600 transition text-sm font-semibold">6 Bandas</button>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center border-b border-inherit bg-card">
+        <div class="flex flex-col">
+            <span class="opacity-50 text-[10px] uppercase font-black tracking-widest">Resistencia</span>
+            <p id="display-resistance" class="text-3xl font-black">0 Ω</p>
+        </div>
+        <div class="flex flex-col">
+            <span class="opacity-50 text-[10px] uppercase font-black tracking-widest">Tolerancia</span>
+            <p id="display-tolerance" class="text-3xl font-black">±0%</p>
+        </div>
+        <div id="temp-container" class="hidden flex flex-col">
+            <span class="opacity-50 text-[10px] uppercase font-black tracking-widest">Coef. Térmico</span>
+            <p id="display-temp" class="text-3xl font-black">-</p>
+        </div>
+    </div>
+
+    <!-- Visualización -->
+    <div class="p-8 flex justify-center bg-sub transition-colors duration-500 overflow-hidden">
+        <svg width="350" height="120" viewBox="0 0 350 120" class="drop-shadow-lg scale-90 md:scale-100">
+            <rect x="0" y="55" width="350" height="8" fill="#cbd5e1" />
+            <path d="M70 40 Q70 25 95 25 L255 25 Q280 25 280 40 L280 80 Q280 95 255 95 L95 95 Q70 95 70 80 Z" class="resistor-body transition-all duration-700" />
+            <rect id="v-band-1" x="95" y="25" width="14" height="70" fill="#8B4513" class="band-transition" />
+            <rect id="v-band-2" x="125" y="27" width="12" height="66" fill="#000" class="band-transition" />
+            <rect id="v-band-3" x="155" y="27" width="12" height="66" fill="#000" class="band-transition opacity-0" />
+            <rect id="v-band-mult" x="185" y="27" width="12" height="66" fill="#FF0000" class="band-transition" />
+            <rect id="v-band-tol" x="225" y="27" width="12" height="66" fill="#D4AF37" class="band-transition" />
+            <rect id="v-band-temp" x="255" y="25" width="14" height="70" fill="transparent" class="band-transition opacity-0" />
+        </svg>
+    </div>
+
+    <!-- Teclado de Colores -->
+    <div class="p-2 md:p-4 overflow-x-auto">
+        <table class="w-full text-center custom-table min-w-[600px]">
+            <thead>
+                <tr class="text-[10px] opacity-60 uppercase font-bold border-b border-inherit">
+                    <th class="p-2">Banda 1</th>
+                    <th class="p-2">Banda 2</th>
+                    <th id="th-band-3" class="p-2 opacity-20">Banda 3</th>
+                    <th class="p-2 w-[12%]">Mult.</th>
+                    <th id="th-tol" class="p-2 w-[12%]">Tol.</th>
+                    <th id="th-temp" class="p-2 opacity-20">Temp.</th>
+                </tr>
+            </thead>
+            <tbody id="color-grid"></tbody>
+        </table>
+    </div>
+
+    <!-- Herramientas -->
+    <div class="p-6 bg-sub border-t border-inherit grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+            <h3 class="font-black text-xs uppercase tracking-widest opacity-70">Validación con Multímetro</h3>
+            <div class="space-y-4">
+                <div class="flex gap-3">
+                    <input type="number" id="measured-value" placeholder="Valor medido..." class="flex-1 p-4 rounded-2xl border-2 outline-none transition font-bold text-lg min-w-0">
+                    <select id="measured-unit" class="w-[85px] md:w-[95px] p-4 rounded-2xl border-2 font-black shrink-0">
+                        <option value="1">Ω</option>
+                        <option value="1000">KΩ</option>
+                        <option value="1000000">MΩ</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <div id="status-box" class="flex-1 p-5 rounded-2xl border-2 border-dashed border-current opacity-40 text-center text-xs font-black uppercase tracking-widest min-w-0">
+                        Sin datos
+                    </div>
+                    <button onclick="resetMeasured()" class="w-[85px] md:w-[95px] py-4 bg-slate-200 dark:bg-slate-700 hover:bg-red-500 hover:text-white rounded-2xl font-black transition-all text-xs uppercase shrink-0">
+                        Borrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="font-black text-xs uppercase tracking-widest opacity-70">Rangos y Sugerencias</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-card-sub p-4 rounded-2xl border border-inherit">
+                    <span class="block opacity-50 text-[10px] font-bold uppercase">Mínimo</span>
+                    <span id="range-min" class="font-black text-lg">-</span>
+                </div>
+                <div class="bg-card-sub p-4 rounded-2xl border border-inherit">
+                    <span class="block opacity-50 text-[10px] font-bold uppercase">Máximo</span>
+                    <span id="range-max" class="font-black text-lg">-</span>
+                </div>
+                <div class="col-span-2 bg-card-sub p-4 rounded-2xl border border-inherit">
+                    <span class="block opacity-50 text-[10px] font-bold uppercase">Valor Comercial (E12)</span>
+                    <span id="suggested-val" class="font-black text-lg text-blue-500">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const COLORS = [
+        { id: 'black', name: 'Negro', hex: '#000000', text: 'white', val: 0, mult: 1, tol: null, temp: 250 },
+        { id: 'brown', name: 'Marrón', hex: '#8B4513', text: 'white', val: 1, mult: 10, tol: 1, temp: 100 },
+        { id: 'red', name: 'Rojo', hex: '#FF0000', text: 'white', val: 2, mult: 100, tol: 2, temp: 50 },
+        { id: 'orange', name: 'Naranja', hex: '#FFA500', text: 'black', val: 3, mult: 1000, tol: null, temp: 15 },
+        { id: 'yellow', name: 'Amarillo', hex: '#FFFF00', text: 'black', val: 4, mult: 10000, tol: null, temp: 25 },
+        { id: 'green', name: 'Verde', hex: '#008000', text: 'white', val: 5, mult: 100000, tol: 0.5, temp: 20 },
+        { id: 'blue', name: 'Azul', hex: '#0000FF', text: 'white', val: 6, mult: 1000000, tol: 0.25, temp: 10 },
+        { id: 'violet', name: 'Violeta', hex: '#9400D3', text: 'white', val: 7, mult: 10000000, tol: 0.1, temp: 5 },
+        { id: 'gray', name: 'Gris', hex: '#808080', text: 'white', val: 8, mult: null, tol: 0.05, temp: 1 },
+        { id: 'white', name: 'Blanco', hex: '#FFFFFF', text: 'black', val: 9, mult: null, tol: null, temp: null },
+        { id: 'gold', name: 'Oro', hex: '#D4AF37', text: 'black', val: null, mult: 0.1, tol: 5, temp: null },
+        { id: 'silver', name: 'Plata', hex: '#C0C0C0', text: 'black', val: null, mult: 0.01, tol: 10, temp: null }
+    ];
+
+    const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+    let currentBands = 4;
+    let selections = { band1: 1, band2: 0, band3: 0, mult: 10, tol: 5, temp: 100 };
+
+    function init() {
+        setBands(4);
+        document.getElementById('measured-value').addEventListener('input', validateValue);
+        document.getElementById('measured-unit').addEventListener('change', validateValue);
+        
+        // Registro de Service Worker mejorado para cumplir con criterios de PWA e instalación
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'resistor-v1';
+                    self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+                    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `;
+                const blob = new Blob([swCode], {type: 'text/javascript'});
+                const url = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(url).catch(() => {});
+            });
+        }
+    }
+
+    function setTheme(theme) {
+        document.body.setAttribute('data-theme', theme);
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        const colors = { light: '#ffffff', dark: '#1e293b', blue: '#075985', pink: '#9d174d' };
+        if (metaTheme) metaTheme.setAttribute('content', colors[theme] || '#ffffff');
+    }
+
+    function resetMeasured() {
+        document.getElementById('measured-value').value = "";
+        const statusBox = document.getElementById('status-box');
+        statusBox.innerText = "Sin datos";
+        statusBox.className = "flex-1 p-5 rounded-2xl border-2 border-dashed border-current opacity-40 text-center text-xs font-black uppercase tracking-widest min-w-0";
+        document.getElementById('measured-value').classList.remove('input-success', 'input-error');
+    }
+
+    function setBands(num) {
+        currentBands = num;
+        document.querySelectorAll('.band-btn').forEach(btn => btn.classList.replace('bg-blue-600', 'bg-white/10'));
+        document.getElementById(`btn-${num}`).classList.replace('bg-white/10', 'bg-blue-600');
+        
+        updateElementUI('th-band-3', num >= 5);
+        updateElementUI('th-temp', num === 6);
+        updateElementUI('th-tol', num >= 4);
+
+        toggleSVG('v-band-3', num >= 5);
+        toggleSVG('v-band-tol', num >= 4);
+        toggleSVG('v-band-temp', num === 6);
+        
+        const tempCont = document.getElementById('temp-container');
+        if (num === 6) tempCont.classList.remove('hidden'); else tempCont.classList.add('hidden');
+
+        renderTable();
+        updateUI();
+    }
+
+    function updateElementUI(id, show) {
+        const el = document.getElementById(id);
+        if (show) el.classList.remove('opacity-20'); else el.classList.add('opacity-20');
+    }
+
+    function toggleSVG(id, show) {
+        const el = document.getElementById(id);
+        if (show) el.classList.remove('opacity-0'); else el.classList.add('opacity-0');
+    }
+
+    function renderTable() {
+        const grid = document.getElementById('color-grid');
+        grid.innerHTML = '';
+        COLORS.forEach((color) => {
+            const tr = document.createElement('tr');
+            tr.appendChild(createColorCell(color, 'band1', color.val));
+            tr.appendChild(createColorCell(color, 'band2', color.val));
+            tr.appendChild(createColorCell(color, 'band3', color.val, currentBands < 5));
+            tr.appendChild(createColorCell(color, 'mult', color.mult !== null ? `x${color.mult}` : null));
+            tr.appendChild(createColorCell(color, 'tol', color.tol !== null ? `±${color.tol}%` : null, currentBands < 4));
+            tr.appendChild(createColorCell(color, 'temp', color.temp ? `${color.temp}` : null, currentBands !== 6));
+            grid.appendChild(tr);
+        });
+    }
+
+    function createColorCell(colorObj, type, displayVal, isDisabled = false) {
+        const td = document.createElement('td');
+        td.className = 'p-0';
+        if (displayVal === null) return td;
+        const div = document.createElement('div');
+        div.className = `color-card rounded-xl p-2 text-lg font-black h-10 flex flex-col items-center justify-center ${isDisabled ? 'opacity-5 pointer-events-none' : ''}`;
+        div.style.backgroundColor = colorObj.hex;
+        div.style.color = colorObj.text;
+        div.innerHTML = `<span>${displayVal}</span>`;
+        
+        const isSelected = (type === 'mult' || type === 'tol' || type === 'temp') ? colorObj[type] === selections[type] : colorObj.val === selections[type];
+        if (isSelected && !isDisabled) {
+            div.classList.add('active');
+            const mapping = { band1: 'v-band-1', band2: 'v-band-2', band3: 'v-band-3', mult: 'v-band-mult', tol: 'v-band-tol', temp: 'v-band-temp' };
+            const svgBand = document.getElementById(mapping[type]);
+            if (svgBand) svgBand.setAttribute('fill', colorObj.hex);
+        }
+
+        div.onclick = () => {
+            selections[type] = (type === 'mult' || type === 'tol' || type === 'temp') ? colorObj[type] : colorObj.val;
+            renderTable(); updateUI();
+        };
+        td.appendChild(div); return td;
+    }
+
+    function updateUI() {
+        let res = (currentBands <= 4) ? (selections.band1 * 10 + selections.band2) * (selections.mult || 1) : (selections.band1 * 100 + selections.band2 * 10 + selections.band3) * (selections.mult || 1);
+        document.getElementById('display-resistance').innerText = formatResistance(res);
+        const tolerance = currentBands === 3 ? 20 : (selections.tol || 20);
+        document.getElementById('display-tolerance').innerText = `±${tolerance}%`;
+        if (currentBands === 6) document.getElementById('display-temp').innerText = `${selections.temp} ppm`;
+
+        const min = res * (1 - tolerance/100), max = res * (1 + tolerance/100);
+        document.getElementById('range-min').innerText = formatResistance(min);
+        document.getElementById('range-max').innerText = formatResistance(max);
+        document.getElementById('suggested-val').innerText = getCommercialSuggestions(res);
+        validateValue();
+    }
+
+    function formatResistance(num) {
+        if (num >= 1e6) return (num / 1e6).toFixed(2).replace(/\.00$/, '') + ' MΩ';
+        if (num >= 1e3) return (num / 1e3).toFixed(2).replace(/\.00$/, '') + ' KΩ';
+        return num.toFixed(2).replace(/\.00$/, '') + ' Ω';
+    }
+
+    function getCommercialSuggestions(val) {
+        if (val === 0) return "0 Ω";
+        const exp = Math.floor(Math.log10(val)), norm = val / Math.pow(10, exp);
+        let low = E12[0], high = E12[E12.length - 1];
+        for (let v of E12) { if (v <= norm) low = v; if (v >= norm) { high = v; break; } }
+        if (norm > 8.2) { low = 8.2; high = 10; }
+        const diff = Math.abs((norm - low) - (high - norm)), gap = high - low;
+        if (diff < gap * 0.20 && low !== high) return `${formatResistance(low * Math.pow(10, exp))} o ${formatResistance(high * Math.pow(10, exp))}`;
+        return formatResistance((norm - low < high - norm ? low : high) * Math.pow(10, exp));
+    }
+
+    function validateValue() {
+        const inputEl = document.getElementById('measured-value');
+        const val = parseFloat(inputEl.value);
+        const mult = parseFloat(document.getElementById('measured-unit').value);
+        if (isNaN(val)) return;
+        const measured = val * mult;
+        let theo = (currentBands <= 4) ? (selections.band1 * 10 + selections.band2) * (selections.mult || 1) : (selections.band1 * 100 + selections.band2 * 10 + selections.band3) * (selections.mult || 1);
+        const tolerance = currentBands === 3 ? 20 : (selections.tol || 20);
+        const err = theo === 0 ? 0 : ((measured - theo) / theo * 100).toFixed(2);
+        const status = document.getElementById('status-box');
+        if (measured >= theo * (1 - tolerance/100) && measured <= theo * (1 + tolerance/100)) {
+            status.innerText = `CORRECTO (${err}%)`; status.className = "flex-1 p-5 rounded-2xl border-2 border-green-500 bg-green-500/20 text-center font-black text-xs text-green-500 uppercase min-w-0";
+            inputEl.className = "flex-1 p-4 rounded-2xl border-2 outline-none font-bold text-lg input-success min-w-0";
+        } else {
+            status.innerText = `FALLO (${err}%)`; status.className = "flex-1 p-5 rounded-2xl border-2 border-red-500 bg-red-500/20 text-center font-black text-xs text-red-500 uppercase min-w-0";
+            inputEl.className = "flex-1 p-4 rounded-2xl border-2 outline-none font-bold text-lg input-error min-w-0";
+        }
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
