@@ -74,13 +74,14 @@
         .color-card.selected {
             border: 3px solid #ffffff;
             box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
-            transform: scale(1.1);
+            transform: scale(1.15); /* Aumentado como se solicitó */
             z-index: 10;
         }
         
         .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        .color-val { font-size: 9px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        /* Aumento del 20% en los números de las teclas */
+        .color-val { font-size: 11px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
         .c-black { background-color: #000000; color: white; }
         .c-brown { background-color: #5d2e0a; color: white; }
@@ -95,19 +96,26 @@
         .c-gold   { background-color: #b8860b; color: white; }
         .c-silver { background-color: #cbd5e1; color: #1e293b; }
 
+        /* Títulos de columnas ligeramente más grandes y texto completo */
         .column-title {
-            font-size: 8px; font-weight: 900; text-transform: uppercase;
-            opacity: 0.7; margin-bottom: 2px;
+            font-size: 9px; font-weight: 900; text-transform: uppercase;
+            opacity: 0.8; margin-bottom: 2px;
+            white-space: nowrap;
         }
         .hidden-col { visibility: hidden; pointer-events: none; }
         
-        /* Aumento del 25% en los textos de resultados */
         .result-text { font-size: 1.56rem; font-weight: 900; line-height: 1; }
+
+        @media print {
+            .section-header, .section-keypad, .section-footer, .theme-dot { display: none !important; }
+            .section-display { height: 100% !important; width: 100% !important; }
+            body { background: white !important; color: black !important; }
+        }
     </style>
 </head>
 <body class="theme-light">
 
-<div class="app-container">
+<div class="app-container" id="capture-area">
     
     <!-- ENCABEZADO -->
     <div class="section-header">
@@ -142,17 +150,15 @@
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
                 <span class="text-[7px] uppercase font-bold opacity-60">Coef. PPM</span>
-                <span id="txt-temp" class="result-text text-orange-500">100</span>
+                <span id="txt-temp" class="result-text text-orange-500">250</span>
             </div>
         </div>
 
         <div class="h-1/2 flex items-center gap-2">
-            <!-- Resistencia y Botón Reiniciar al lado -->
             <div class="flex-grow flex justify-center">
                 <svg viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
                     <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
                     <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
-                    <!-- Bandas ensanchadas y reubicadas para no cortar la 6ta -->
                     <rect id="v-b1" x="75" y="5" width="16" height="60" fill="#5d2e0a" />
                     <rect id="v-b2" x="105" y="5" width="14" height="60" fill="#000000" />
                     <rect id="v-b3" x="135" y="5" width="14" height="60" fill="transparent" class="hidden" />
@@ -161,8 +167,9 @@
                     <rect id="v-bc" x="230" y="5" width="12" height="60" fill="transparent" class="hidden" />
                 </svg>
             </div>
-            <button onclick="location.reload()" class="w-12 h-10 bg-white/10 rounded-lg flex items-center justify-center text-lg active:scale-90 border border-white/5 flex-shrink-0">
-                🔄
+            <!-- Botón RESET Rojo y más grande -->
+            <button onclick="location.reload()" class="px-3 h-11 bg-red-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white active:scale-90 shadow-lg border border-red-400 flex-shrink-0">
+                RESET
             </button>
         </div>
     </div>
@@ -170,11 +177,11 @@
     <!-- TECLADO DE COLORES -->
     <div class="section-keypad">
         <div class="grid grid-cols-6 gap-x-1.5 text-center">
-            <span class="column-title">B1</span>
-            <span class="column-title">B2</span>
-            <span id="kb-lbl-d3" class="column-title hidden-col">B3</span>
-            <span class="column-title">MULT</span>
-            <span id="kb-lbl-tol" class="column-title">TOL</span>
+            <span class="column-title">BANDA 1</span>
+            <span class="column-title">BANDA 2</span>
+            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
+            <span class="column-title">MULT.</span>
+            <span id="kb-lbl-tol" class="column-title">TOLER.</span>
             <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
         </div>
         <div id="keyboard" class="color-grid"></div>
@@ -182,7 +189,7 @@
 
     <!-- ACCIONES FINALES -->
     <div class="section-footer">
-        <button class="w-full bg-blue-600 h-14 rounded-2xl font-black text-[14px] text-white shadow-xl active:scale-95 uppercase tracking-widest">
+        <button onclick="captureScreen()" class="w-full bg-blue-600 h-14 rounded-2xl font-black text-[14px] text-white shadow-xl active:scale-95 uppercase tracking-widest">
             Guardar Captura
         </button>
     </div>
@@ -206,10 +213,9 @@
     ];
 
     let currentBands = 4;
-    // Flags para detectar primera vez que se entra a un modo
     let visited5 = false;
     let visited6 = false;
-    let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 100 };
+    let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 };
 
     function initKeyboard() {
         const kb = document.getElementById('keyboard');
@@ -306,14 +312,13 @@
     function setBands(n) {
         currentBands = n;
         
-        // Lógica de valores por defecto solo la primera vez que se activan
         if (n >= 5 && !visited5) {
-            selections.b3 = 0; // Banda 3 en Negro
+            selections.b3 = 0;
             visited5 = true;
         }
         
         if (n === 6 && !visited6) {
-            selections.ppm = 100; // Banda 6 en Café
+            selections.ppm = 250; // Ajustado a Negro como primera opción
             visited6 = true;
         }
 
@@ -331,6 +336,12 @@
         
         updateVisuals();
         updateUI();
+    }
+
+    function captureScreen() {
+        // Al ejecutar el comando de impresión, el usuario puede elegir "Guardar como PDF" 
+        // para obtener una captura fiel de la aplicación.
+        window.print();
     }
 
     window.onload = initKeyboard;
