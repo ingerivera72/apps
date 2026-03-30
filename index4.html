@@ -16,11 +16,12 @@
             touch-action: none;
         }
 
+        /* Temas */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
         body.theme-green { background-color: #064e3b; color: #ecfdf5; }
-        body.theme-blue { background-color: #bae6fd; color: #0369a1; }
-        body.theme-pink { background-color: #fce7f3; color: #9d174d; }
+        body.theme-blue { background-color: #075985; color: #e0f2fe; }
+        body.theme-pink { background-color: #831843; color: #fce7f3; }
 
         .app-container {
             height: 100dvh;
@@ -29,95 +30,111 @@
             padding: env(safe-area-inset-top, 8px) 12px env(safe-area-inset-bottom, 8px);
         }
 
+        /* Bloques */
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
         .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
-        .section-keypad  { height: 45%; display: flex; flex-direction: column; }
-        .section-validation { height: 30%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+        .section-keypad  { height: 55%; display: flex; flex-direction: column; }
+        .section-toolblock { height: 20%; display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
 
         .glass-panel {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(128, 128, 128, 0.1);
-            border-radius: 12px;
-            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            border-radius: 10px;
         }
 
-        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; }
         .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); }
 
         .band-btn {
-            flex: 1; padding: 4px 0; font-size: 11px; font-weight: 900; border-radius: 8px;
+            flex: 1; padding: 4px 0; font-size: 10px; font-weight: 900; border-radius: 6px;
             transition: all 0.2s; color: inherit; opacity: 0.5;
         }
         .band-btn.active { background: #3b82f6; color: white; opacity: 1; }
 
+        /* Colores de las Teclas */
+        .c-black { background-color: #000000; color: white; }
+        .c-brown { background-color: #5d2e0a; color: white; }
+        .c-red { background-color: #dc2626; color: white; }
+        .c-orange { background-color: #ea580c; color: white; }
+        .c-yellow { background-color: #eab308; color: black; }
+        .c-green { background-color: #166534; color: white; }
+        .c-blue { background-color: #1e40af; color: white; }
+        .c-violet { background-color: #7c3aed; color: white; }
+        .c-gray { background-color: #64748b; color: white; }
+        .c-white { background-color: #ffffff; color: black; }
+        .c-gold { background-color: #b8860b; color: white; }
+        .c-silver { background-color: #cbd5e1; color: black; }
+
         .color-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            column-gap: 6px; 
-            row-gap: 4px;
+            column-gap: 4px; 
+            row-gap: 2px;
             flex-grow: 1;
         }
 
-        /* Corregido: Altura fija para evitar desplazamientos de renglones */
         .color-card {
-            position: relative;
             height: 28px; 
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            box-sizing: border-box;
-            overflow: visible;
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            position: relative;
         }
         
         .color-card.selected {
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
-            z-index: 10;
+            outline: 2px solid #3b82f6;
+            outline-offset: 1px;
+            z-index: 5;
         }
 
-        /* Corregido: El número crece sin afectar el tamaño del contenedor padre */
         .color-val { 
-            font-size: 13px; 
+            font-size: 12px; 
             font-weight: 900; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            display: inline-block;
-            line-height: 1;
+            transition: transform 0.1s;
         }
         .selected .color-val {
-            font-size: 17px; 
-            transform: scale(1.1);
+            transform: scale(1.4);
         }
         
         .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        .column-title {
-            font-size: 9px; font-weight: 900; text-transform: uppercase;
-            opacity: 0.8; margin-bottom: 2px;
-        }
+        .column-title { font-size: 8px; font-weight: 900; opacity: 0.7; }
 
-        .result-text { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+        .result-text { font-size: 1.4rem; font-weight: 900; line-height: 1; }
 
-        /* Estilos Validación */
+        /* Herramientas */
         .status-box {
-            width: 100%; height: 40px; border-radius: 8px; display: flex;
+            height: 32px; border-radius: 6px; display: flex;
             align-items: center; justify-content: center; font-weight: 900;
-            font-size: 12px; transition: all 0.3s;
+            font-size: 10px; transition: all 0.3s;
         }
-        .status-off { background: rgba(128,128,128,0.1); color: transparent; }
+        .status-off { background: rgba(128,128,128,0.1); color: gray; }
         .status-ok { background: #16a34a; color: white; }
         .status-fail { background: #dc2626; color: white; }
 
         input[type="number"] {
             background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(128,128,128,0.3);
-            border-radius: 8px;
-            padding: 8px;
-            width: 80px;
+            border: 1px solid rgba(128,128,128,0.4);
+            border-radius: 6px;
+            height: 32px;
+            width: 70px;
             color: inherit;
-            font-weight: bold;
+            font-weight: 900;
             text-align: center;
+            font-size: 12px;
+        }
+
+        select {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(128,128,128,0.4);
+            border-radius: 6px;
+            height: 32px;
+            padding: 0 4px;
+            font-size: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -125,38 +142,36 @@
 
 <div class="app-container">
     
-    <!-- ENCABEZADO -->
+    <!-- BLOQUE 1: HEADER -->
     <div class="section-header">
         <div class="flex justify-between items-center mb-1">
-            <h1 class="text-[10px] font-black uppercase italic tracking-wider">Resistor Pro Advance</h1>
+            <h1 class="text-[9px] font-black uppercase italic tracking-widest">Resistor Pro Advance</h1>
             <div class="flex gap-2 items-center">
                 <div onclick="setTheme('light')" class="theme-dot bg-white active"></div>
-                <div onclick="setTheme('dark')" class="theme-dot bg-slate-950"></div>
-                <div onclick="setTheme('green')" class="theme-dot bg-emerald-700"></div>
-                <div onclick="setTheme('blue')" class="theme-dot bg-sky-600"></div>
+                <div onclick="setTheme('dark')" class="theme-dot bg-slate-900"></div>
+                <div onclick="setTheme('green')" class="theme-dot bg-emerald-800"></div>
+                <div onclick="setTheme('blue')" class="theme-dot bg-sky-800"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-pink-800"></div>
             </div>
         </div>
         <div class="glass-panel flex p-0.5 gap-1">
-            <button onclick="setBands(3)" id="btn-3b" class="band-btn">3 BANDAS</button>
-            <button onclick="setBands(4)" id="btn-4b" class="band-btn active">4 BANDAS</button>
-            <button onclick="setBands(5)" id="btn-5b" class="band-btn">5 BANDAS</button>
-            <button onclick="setBands(6)" id="btn-6b" class="band-btn">6 BANDAS</button>
+            <button onclick="setBands(3)" id="btn-3b" class="band-btn">3B</button>
+            <button onclick="setBands(4)" id="btn-4b" class="band-btn active">4B</button>
+            <button onclick="setBands(5)" id="btn-5b" class="band-btn">5B</button>
+            <button onclick="setBands(6)" id="btn-6b" class="band-btn">6B</button>
         </div>
     </div>
 
-    <!-- PANTALLA -->
+    <!-- BLOQUE 2: PANTALLA -->
     <div class="section-display">
         <div class="flex gap-1.5 h-1/2 mb-1">
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
-                <span class="text-[7px] uppercase font-bold opacity-60">Nominal</span>
                 <span id="txt-val" class="result-text tracking-tighter">--</span>
             </div>
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
-                <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
                 <span id="txt-tol" class="result-text text-emerald-500">--</span>
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
-                <span class="text-[7px] uppercase font-bold opacity-60">PPM</span>
                 <span id="txt-temp" class="result-text text-orange-500">--</span>
             </div>
         </div>
@@ -173,48 +188,47 @@
                     <rect id="v-bc" x="220" y="5" width="10" height="50" fill="transparent" class="hidden" />
                 </svg>
             </div>
-            <button onclick="resetAll()" class="px-3 h-8 bg-red-600 rounded-lg text-[10px] font-black text-white active:scale-90 shadow-lg">RESET</button>
+            <button onclick="resetAll()" class="px-2 h-8 bg-red-600 rounded-lg text-[9px] font-black text-white active:scale-90 shadow-lg">RESET</button>
         </div>
     </div>
 
-    <!-- TECLADO -->
+    <!-- BLOQUE 3: TECLADO (55%) -->
     <div class="section-keypad">
-        <div class="grid grid-cols-6 gap-x-1.5 text-center">
+        <div class="grid grid-cols-6 gap-x-1 text-center mb-1">
             <span class="column-title">B1</span><span class="column-title">B2</span><span id="kb-lbl-d3" class="column-title hidden-col">B3</span><span class="column-title">MULT</span><span id="kb-lbl-tol" class="column-title">TOL</span><span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
         </div>
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- VALIDACIÓN Y RANGOS -->
-    <div class="section-validation">
-        <div class="glass-panel flex flex-col gap-2 p-3">
-            <span class="text-[9px] font-black uppercase opacity-70">Validación con multímetro</span>
-            <div class="flex items-center gap-2">
+    <!-- BLOQUE 4: HERRAMIENTAS (20%) -->
+    <div class="section-toolblock">
+        <div class="glass-panel p-2 flex flex-col gap-1">
+            <span class="text-[8px] font-black uppercase opacity-60">Validación con multímetro</span>
+            <div class="flex items-center gap-1.5">
                 <input type="number" id="meter-input" placeholder="0.00" oninput="validateMeter()">
-                <select id="meter-unit" class="bg-transparent border border-gray-500 rounded p-1 text-xs font-bold" onchange="validateMeter()">
+                <select id="meter-unit" onchange="validateMeter()">
                     <option value="1">Ω</option>
                     <option value="1000">KΩ</option>
                     <option value="1000000">MΩ</option>
                 </select>
-                <div id="meter-status" class="status-box status-off flex-1">ESPERANDO...</div>
-                <button onclick="clearMeter()" class="bg-gray-500 p-2 rounded-lg text-white text-[10px] font-black">BORRAR</button>
+                <div id="meter-status" class="status-box status-off flex-1">OFF</div>
+                <button onclick="clearMeter()" class="bg-gray-600/50 px-2 h-[32px] rounded-lg text-[8px] font-black">DEL</button>
             </div>
         </div>
 
-        <div class="glass-panel flex flex-col gap-2 p-3">
-            <span class="text-[9px] font-black uppercase opacity-70">Rangos y Sugerencias E12</span>
+        <div class="glass-panel p-2 flex flex-col gap-1">
             <div class="grid grid-cols-3 gap-2">
-                <div class="bg-black/10 rounded p-1 text-center">
-                    <div class="text-[7px] uppercase font-bold opacity-50">Mínimo</div>
-                    <div id="range-min" class="text-xs font-black">--</div>
+                <div class="text-center">
+                    <div class="text-[7px] uppercase font-bold opacity-50">Mín</div>
+                    <div id="range-min" class="text-[10px] font-black">--</div>
                 </div>
-                <div class="bg-black/10 rounded p-1 text-center">
-                    <div class="text-[7px] uppercase font-bold opacity-50">Máximo</div>
-                    <div id="range-max" class="text-xs font-black">--</div>
+                <div class="text-center">
+                    <div class="text-[7px] uppercase font-bold opacity-50">Máx</div>
+                    <div id="range-max" class="text-[10px] font-black">--</div>
                 </div>
-                <div class="bg-black/10 rounded p-1 text-center border border-blue-400/30">
-                    <div class="text-[7px] uppercase font-bold opacity-50 text-blue-500">Valor Comercial</div>
-                    <div id="suggest-e12" class="text-[9px] font-black leading-tight">--</div>
+                <div class="text-center border-l border-white/10">
+                    <div class="text-[7px] uppercase font-bold opacity-50 text-blue-400">E12</div>
+                    <div id="suggest-e12" class="text-[9px] font-black leading-none">--</div>
                 </div>
             </div>
         </div>
@@ -282,7 +296,12 @@
         document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected', 'disabled'));
         keys.forEach((key, idx) => {
             const val = selections[key];
-            let colorObj = (key === 'mult') ? colors.find(c => c.mult === val) : (key === 'tol' ? colors.find(c => c.tol === val) : (key === 'ppm' ? colors.find(c => c.ppm === val) : colors.find(c => c.val === val)));
+            let colorObj;
+            if (key === 'mult') colorObj = colors.find(c => c.mult === val);
+            else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
+            else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
+            else colorObj = colors.find(c => c.val === val);
+
             if (colorObj) {
                 document.getElementById(svgIds[idx]).setAttribute('fill', colorObj.hex);
                 document.getElementById(`btn-col-${idx}-${colorObj.code}`).classList.add('selected');
@@ -293,16 +312,14 @@
             if (currentBands < 5) document.getElementById(`btn-col-2-${c.code}`).classList.add('disabled');
             if (currentBands === 3) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
             if (currentBands < 6) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
-            if (c.val === null) [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled'));
-            if (c.mult === null) document.getElementById(`btn-col-3-${c.code}`).classList.add('disabled');
-            if (c.tol === null) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
-            if (c.ppm === null) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
         });
         calculate();
     }
 
     function formatVal(v) {
-        return v >= 1000000 ? (v/1000000).toFixed(2).replace(/\.00$/, '') + "M" : (v >= 1000 ? (v/1000).toFixed(2).replace(/\.00$/, '') + "k" : v.toFixed(2).replace(/\.00$/, ''));
+        if (v >= 1000000) return (v/1000000).toFixed(2).replace(/\.00$/, '') + "M";
+        if (v >= 1000) return (v/1000).toFixed(2).replace(/\.00$/, '') + "k";
+        return v.toFixed(2).replace(/\.00$/, '');
     }
 
     function calculate() {
@@ -312,26 +329,21 @@
         
         document.getElementById('txt-val').innerText = formatVal(nominalValue) + " Ω";
         document.getElementById('txt-tol').innerText = "±" + tolPerc + "%";
-        document.getElementById('txt-temp').innerText = selections.ppm || "--";
+        document.getElementById('txt-temp').innerText = selections.ppm ? selections.ppm + "ppm" : "--";
 
-        // Rangos
         let min = nominalValue * (1 - tolPerc/100);
         let max = nominalValue * (1 + tolPerc/100);
         document.getElementById('range-min').innerText = formatVal(min) + " Ω";
         document.getElementById('range-max').innerText = formatVal(max) + " Ω";
 
-        // Sugerencia E12
         let log = Math.log10(nominalValue);
         let power = Math.floor(log);
         let base = nominalValue / Math.pow(10, power);
-        
-        // Encontrar los dos más cercanos
         let lower = E12[0], upper = E12[E12.length-1];
         for(let i=0; i<E12.length; i++){
             if(E12[i] <= base) lower = E12[i];
             if(E12[i] >= base) { upper = E12[i]; break; }
         }
-
         let s1 = formatVal(lower * Math.pow(10, power));
         let s2 = formatVal(upper * Math.pow(10, power));
         document.getElementById('suggest-e12').innerText = (s1 === s2) ? s1 : `${s1} / ${s2}`;
@@ -344,17 +356,15 @@
         const status = document.getElementById('meter-status');
         if (!input.value) {
             status.className = "status-box status-off flex-1";
-            status.innerText = "ESPERANDO...";
+            status.innerText = "OFF";
             return;
         }
-
         let measured = parseFloat(input.value) * parseFloat(document.getElementById('meter-unit').value);
         let tolPerc = currentBands === 3 ? 20 : selections.tol;
         let diff = ((measured - nominalValue) / nominalValue) * 100;
-        
         if (Math.abs(diff) <= tolPerc) {
             status.className = "status-box status-ok flex-1";
-            status.innerText = `DENTRO (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`;
+            status.innerText = `OK (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`;
         } else {
             status.className = "status-box status-fail flex-1";
             status.innerText = `FALLO (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`;
