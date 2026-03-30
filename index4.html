@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Resistor Pro Advance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            touch-action: none;
+        }
+
+        body.theme-light { background-color: #f8fafc; color: #0f172a; }
+        body.theme-dark { background-color: #020617; color: #f1f5f9; }
+        body.theme-green { background-color: #064e3b; color: #ecfdf5; }
+        body.theme-blue { background-color: #bae6fd; color: #0369a1; }
+        body.theme-pink { background-color: #fce7f3; color: #9d174d; }
+
+        .app-container {
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top, 8px) 12px env(safe-area-inset-bottom, 8px);
+            justify-content: space-between;
+        }
+
+        .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
+        .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
+        .section-keypad  { height: 55%; display: flex; flex-direction: column; }
+        .section-footer  { height: 20%; display: flex; flex-direction: column; justify-content: center; }
+
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(128, 128, 128, 0.1);
+            border-radius: 12px;
+            padding: 4px 8px;
+        }
+
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
+        .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+
+        .band-btn {
+            flex: 1; padding: 4px 0; font-size: 11px; font-weight: 900; border-radius: 8px;
+            transition: all 0.2s; color: inherit; opacity: 0.5;
+        }
+        .band-btn.active { background: #3b82f6; color: white; opacity: 1; }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            column-gap: 6px; 
+            row-gap: 3px;
+            flex-grow: 1;
+        }
+
+        .color-card {
+            height: calc(100% - 4px); 
+            min-height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .color-card.selected {
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
+            transform: scale(1.15); /* Aumentado como se solicitó */
+            z-index: 10;
+        }
+        
+        .color-card.disabled { opacity: 0.05; pointer-events: none; }
+
+        /* Aumento del 20% en los números de las teclas */
+        .color-val { font-size: 11px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+        .c-black { background-color: #000000; color: white; }
+        .c-brown { background-color: #5d2e0a; color: white; }
+        .c-red   { background-color: #dc2626; color: white; }
+        .c-orange { background-color: #ea580c; color: white; }
+        .c-yellow { background-color: #eab308; color: black; }
+        .c-green  { background-color: #166534; color: white; }
+        .c-blue   { background-color: #1e40af; color: white; }
+        .c-violet { background-color: #7c3aed; color: white; }
+        .c-gray   { background-color: #64748b; color: white; }
+        .c-white  { background-color: #ffffff; color: black; }
+        .c-gold   { background-color: #b8860b; color: white; }
+        .c-silver { background-color: #cbd5e1; color: #1e293b; }
+
+        /* Títulos de columnas ligeramente más grandes y texto completo */
+        .column-title {
+            font-size: 9px; font-weight: 900; text-transform: uppercase;
+            opacity: 0.8; margin-bottom: 2px;
+            white-space: nowrap;
+        }
+        .hidden-col { visibility: hidden; pointer-events: none; }
+        
+        .result-text { font-size: 1.56rem; font-weight: 900; line-height: 1; }
+
+        @media print {
+            .section-header, .section-keypad, .section-footer, .theme-dot { display: none !important; }
+            .section-display { height: 100% !important; width: 100% !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="theme-light">
+
+<div class="app-container" id="capture-area">
+    
+    <!-- ENCABEZADO -->
+    <div class="section-header">
+        <div class="flex justify-between items-center mb-1">
+            <h1 class="text-[10px] font-black uppercase italic tracking-wider">Resistor Pro Advance</h1>
+            <div class="flex gap-2 items-center">
+                <div onclick="setTheme('light')" class="theme-dot bg-white active"></div>
+                <div onclick="setTheme('dark')" class="theme-dot bg-slate-950"></div>
+                <div onclick="setTheme('green')" class="theme-dot bg-emerald-700"></div>
+                <div onclick="setTheme('blue')" class="theme-dot bg-sky-600"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-pink-400"></div>
+            </div>
+        </div>
+        <div class="glass-panel flex p-0.5 gap-1">
+            <button onclick="setBands(3)" id="btn-3b" class="band-btn">3 BANDAS</button>
+            <button onclick="setBands(4)" id="btn-4b" class="band-btn active">4 BANDAS</button>
+            <button onclick="setBands(5)" id="btn-5b" class="band-btn">5 BANDAS</button>
+            <button onclick="setBands(6)" id="btn-6b" class="band-btn">6 BANDAS</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE RESULTADOS -->
+    <div class="section-display">
+        <div class="flex gap-1.5 h-1/2 mb-1">
+            <div class="glass-panel flex-1 text-center flex flex-col justify-center">
+                <span class="text-[7px] uppercase font-bold opacity-60">Valor Nominal</span>
+                <span id="txt-val" class="result-text tracking-tighter">1.0k Ω</span>
+            </div>
+            <div class="glass-panel flex-1 text-center flex flex-col justify-center">
+                <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
+                <span id="txt-tol" class="result-text text-emerald-500">±5%</span>
+            </div>
+            <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
+                <span class="text-[7px] uppercase font-bold opacity-60">Coef. PPM</span>
+                <span id="txt-temp" class="result-text text-orange-500">250</span>
+            </div>
+        </div>
+
+        <div class="h-1/2 flex items-center gap-2">
+            <div class="flex-grow flex justify-center">
+                <svg viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
+                    <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
+                    <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
+                    <rect id="v-b1" x="75" y="5" width="16" height="60" fill="#5d2e0a" />
+                    <rect id="v-b2" x="105" y="5" width="14" height="60" fill="#000000" />
+                    <rect id="v-b3" x="135" y="5" width="14" height="60" fill="transparent" class="hidden" />
+                    <rect id="v-bm" x="165" y="5" width="14" height="60" fill="#ea580c" />
+                    <rect id="v-bt" x="200" y="5" width="16" height="60" fill="#b8860b" />
+                    <rect id="v-bc" x="230" y="5" width="12" height="60" fill="transparent" class="hidden" />
+                </svg>
+            </div>
+            <!-- Botón RESET Rojo y más grande -->
+            <button onclick="location.reload()" class="px-3 h-11 bg-red-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white active:scale-90 shadow-lg border border-red-400 flex-shrink-0">
+                RESET
+            </button>
+        </div>
+    </div>
+
+    <!-- TECLADO DE COLORES -->
+    <div class="section-keypad">
+        <div class="grid grid-cols-6 gap-x-1.5 text-center">
+            <span class="column-title">BANDA 1</span>
+            <span class="column-title">BANDA 2</span>
+            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
+            <span class="column-title">MULT.</span>
+            <span id="kb-lbl-tol" class="column-title">TOLER.</span>
+            <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
+        </div>
+        <div id="keyboard" class="color-grid"></div>
+    </div>
+
+    <!-- ACCIONES FINALES -->
+    <div class="section-footer">
+        <button onclick="captureScreen()" class="w-full bg-blue-600 h-14 rounded-2xl font-black text-[14px] text-white shadow-xl active:scale-95 uppercase tracking-widest">
+            Guardar Captura
+        </button>
+    </div>
+
+</div>
+
+<script>
+    const colors = [
+        { code: 'c-black', hex: '#000000', val: 0, mult: 1, tol: null, ppm: 250 },
+        { code: 'c-brown', hex: '#5d2e0a', val: 1, mult: 10, tol: 1, ppm: 100 },
+        { code: 'c-red', hex: '#dc2626', val: 2, mult: 100, tol: 2, ppm: 50 },
+        { code: 'c-orange', hex: '#ea580c', val: 3, mult: 1000, tol: null, ppm: 15 },
+        { code: 'c-yellow', hex: '#eab308', val: 4, mult: 10000, tol: null, ppm: 25 },
+        { code: 'c-green', hex: '#166534', val: 5, mult: 100000, tol: 0.5, ppm: 20 },
+        { code: 'c-blue', hex: '#1e40af', val: 6, mult: 1000000, tol: 0.25, ppm: 10 },
+        { code: 'c-violet', hex: '#7c3aed', val: 7, mult: 10000000, tol: 0.1, ppm: 5 },
+        { code: 'c-gray', hex: '#64748b', val: 8, mult: null, tol: 0.05, ppm: 1 },
+        { code: 'c-white', hex: '#ffffff', val: 9, mult: null, tol: null, ppm: null },
+        { code: 'c-gold', hex: '#b8860b', val: null, mult: 0.1, tol: 5, ppm: null },
+        { code: 'c-silver', hex: '#cbd5e1', val: null, mult: 0.01, tol: 10, ppm: null }
+    ];
+
+    let currentBands = 4;
+    let visited5 = false;
+    let visited6 = false;
+    let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 };
+
+    function initKeyboard() {
+        const kb = document.getElementById('keyboard');
+        kb.innerHTML = '';
+        colors.forEach(c => {
+            for(let i=0; i<6; i++) {
+                const btn = document.createElement('div');
+                btn.id = `btn-col-${i}-${c.code}`;
+                btn.className = `color-card ${c.code}`;
+                
+                let displayVal = "";
+                if (i < 3) displayVal = c.val !== null ? c.val : "";
+                else if (i === 3) displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : "";
+                else if (i === 4) displayVal = c.tol !== null ? c.tol + "%" : "";
+                else if (i === 5) displayVal = c.ppm !== null ? c.ppm : "";
+
+                btn.onclick = (e) => selectColor(i, c);
+                btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
+                kb.appendChild(btn);
+            }
+        });
+        updateVisuals();
+        updateUI();
+    }
+
+    function selectColor(col, color) {
+        const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
+        if (col < 3 && color.val === null) return;
+        if (col === 3 && color.mult === null) return;
+        if (col === 4 && color.tol === null) return;
+        if (col === 5 && color.ppm === null) return;
+
+        selections[keys[col]] = (col === 3) ? color.mult : (col === 4 ? color.tol : (col === 5 ? color.ppm : color.val));
+        updateVisuals();
+        updateUI();
+    }
+
+    function updateVisuals() {
+        const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
+        const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
+        
+        keys.forEach((key, idx) => {
+            const val = selections[key];
+            let colorObj;
+            if (key === 'mult') colorObj = colors.find(c => c.mult === val);
+            else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
+            else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
+            else colorObj = colors.find(c => c.val === val);
+            
+            if (colorObj) {
+                document.getElementById(svgIds[idx]).setAttribute('fill', colorObj.hex);
+            }
+        });
+    }
+
+    function updateUI() {
+        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected', 'disabled'));
+        colors.forEach(c => {
+            if (selections.b1 === c.val) document.getElementById(`btn-col-0-${c.code}`).classList.add('selected');
+            if (selections.b2 === c.val) document.getElementById(`btn-col-1-${c.code}`).classList.add('selected');
+            if (selections.b3 === c.val) document.getElementById(`btn-col-2-${c.code}`).classList.add('selected');
+            if (selections.mult === c.mult) document.getElementById(`btn-col-3-${c.code}`).classList.add('selected');
+            if (selections.tol === c.tol) document.getElementById(`btn-col-4-${c.code}`).classList.add('selected');
+            if (selections.ppm === c.ppm && c.ppm !== null) document.getElementById(`btn-col-5-${c.code}`).classList.add('selected');
+            
+            if (currentBands < 5) document.getElementById(`btn-col-2-${c.code}`).classList.add('disabled');
+            if (currentBands === 3) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
+            if (currentBands < 6) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
+            
+            if (c.val === null) [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled'));
+            if (c.mult === null) document.getElementById(`btn-col-3-${c.code}`).classList.add('disabled');
+            if (c.tol === null) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
+            if (c.ppm === null) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
+        });
+        calculate();
+    }
+
+    function calculate() {
+        let val = (currentBands < 5) ? (selections.b1 * 10 + selections.b2) : (selections.b1 * 100 + selections.b2 * 10 + selections.b3);
+        let total = val * selections.mult;
+        let label = total >= 1000000 ? (total/1000000).toFixed(total % 1000000 === 0 ? 0 : 2) + "M" : 
+                    (total >= 1000 ? (total/1000).toFixed(total % 1000 === 0 ? 0 : 2) + "k" : total.toFixed(total % 1 === 0 ? 0 : 2));
+        document.getElementById('txt-val').innerText = label + " Ω";
+        document.getElementById('txt-tol').innerText = currentBands === 3 ? "±20%" : "±" + selections.tol + "%";
+        document.getElementById('txt-temp').innerText = selections.ppm || "--";
+    }
+
+    function setTheme(t) { 
+        document.body.className = 'theme-' + t;
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    function setBands(n) {
+        currentBands = n;
+        
+        if (n >= 5 && !visited5) {
+            selections.b3 = 0;
+            visited5 = true;
+        }
+        
+        if (n === 6 && !visited6) {
+            selections.ppm = 250; // Ajustado a Negro como primera opción
+            visited6 = true;
+        }
+
+        document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+n+'b').classList.add('active');
+        
+        document.getElementById('v-b3').classList.toggle('hidden', n < 5);
+        document.getElementById('v-bt').classList.toggle('hidden', n === 3);
+        document.getElementById('v-bc').classList.toggle('hidden', n < 6);
+        document.getElementById('box-temp').classList.toggle('hidden', n < 6);
+        
+        document.getElementById('kb-lbl-d3').classList.toggle('hidden-col', n < 5);
+        document.getElementById('kb-lbl-tol').classList.toggle('hidden-col', n === 3);
+        document.getElementById('kb-lbl-ppm').classList.toggle('hidden-col', n < 6);
+        
+        updateVisuals();
+        updateUI();
+    }
+
+    function captureScreen() {
+        // Al ejecutar el comando de impresión, el usuario puede elegir "Guardar como PDF" 
+        // para obtener una captura fiel de la aplicación.
+        window.print();
+    }
+
+    window.onload = initKeyboard;
+</script>
+</body>
+</html>
