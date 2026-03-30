@@ -57,31 +57,45 @@
             column-gap: 6px; 
             row-gap: 3px;
             flex-grow: 1;
+            align-items: stretch;
         }
 
         .color-card {
-            height: calc(100% - 4px); 
+            position: relative;
+            height: calc(100% - 2px); 
             min-height: 20px;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1px solid rgba(128, 128, 128, 0.2);
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            box-sizing: border-box;
         }
         
+        /* Corregido el movimiento de renglones usando escala sin afectar el layout */
         .color-card.selected {
-            border: 3px solid #ffffff;
-            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
-            transform: scale(1.15); /* Aumentado como se solicitó */
-            z-index: 10;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 12px 2px rgba(59, 130, 246, 0.8);
+            transform: scale(1.12); 
+            z-index: 20;
+        }
+        
+        .color-card.selected .color-val {
+            font-size: 15px; /* Número más grande cuando está seleccionado */
+            transform: scale(1.1);
         }
         
         .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        /* Aumento del 20% en los números de las teclas */
-        .color-val { font-size: 11px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        /* Tamaño base de números aumentado */
+        .color-val { 
+            font-size: 13px; 
+            font-weight: 900; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
+            transition: all 0.1s;
+        }
 
         .c-black { background-color: #000000; color: white; }
         .c-brown { background-color: #5d2e0a; color: white; }
@@ -96,20 +110,20 @@
         .c-gold   { background-color: #b8860b; color: white; }
         .c-silver { background-color: #cbd5e1; color: #1e293b; }
 
-        /* Títulos de columnas ligeramente más grandes y texto completo */
         .column-title {
-            font-size: 9px; font-weight: 900; text-transform: uppercase;
-            opacity: 0.8; margin-bottom: 2px;
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+            opacity: 0.9; margin-bottom: 4px;
             white-space: nowrap;
         }
         .hidden-col { visibility: hidden; pointer-events: none; }
         
-        .result-text { font-size: 1.56rem; font-weight: 900; line-height: 1; }
+        .result-text { font-size: 1.6rem; font-weight: 900; line-height: 1; }
 
         @media print {
             .section-header, .section-keypad, .section-footer, .theme-dot { display: none !important; }
-            .section-display { height: 100% !important; width: 100% !important; }
+            .section-display { height: 100% !important; width: 100% !important; margin: 0 !important; }
             body { background: white !important; color: black !important; }
+            .app-container { padding: 0 !important; justify-content: center !important; }
         }
     </style>
 </head>
@@ -155,8 +169,8 @@
         </div>
 
         <div class="h-1/2 flex items-center gap-2">
-            <div class="flex-grow flex justify-center">
-                <svg viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
+            <div class="flex-grow flex justify-center overflow-hidden">
+                <svg id="resistor-svg-main" viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
                     <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
                     <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
                     <rect id="v-b1" x="75" y="5" width="16" height="60" fill="#5d2e0a" />
@@ -167,7 +181,6 @@
                     <rect id="v-bc" x="230" y="5" width="12" height="60" fill="transparent" class="hidden" />
                 </svg>
             </div>
-            <!-- Botón RESET Rojo y más grande -->
             <button onclick="location.reload()" class="px-3 h-11 bg-red-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white active:scale-90 shadow-lg border border-red-400 flex-shrink-0">
                 RESET
             </button>
@@ -311,36 +324,23 @@
 
     function setBands(n) {
         currentBands = n;
-        
-        if (n >= 5 && !visited5) {
-            selections.b3 = 0;
-            visited5 = true;
-        }
-        
-        if (n === 6 && !visited6) {
-            selections.ppm = 250; // Ajustado a Negro como primera opción
-            visited6 = true;
-        }
-
+        if (n >= 5 && !visited5) { selections.b3 = 0; visited5 = true; }
+        if (n === 6 && !visited6) { selections.ppm = 250; visited6 = true; }
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+n+'b').classList.add('active');
-        
         document.getElementById('v-b3').classList.toggle('hidden', n < 5);
         document.getElementById('v-bt').classList.toggle('hidden', n === 3);
         document.getElementById('v-bc').classList.toggle('hidden', n < 6);
         document.getElementById('box-temp').classList.toggle('hidden', n < 6);
-        
         document.getElementById('kb-lbl-d3').classList.toggle('hidden-col', n < 5);
         document.getElementById('kb-lbl-tol').classList.toggle('hidden-col', n === 3);
         document.getElementById('kb-lbl-ppm').classList.toggle('hidden-col', n < 6);
-        
         updateVisuals();
         updateUI();
     }
 
     function captureScreen() {
-        // Al ejecutar el comando de impresión, el usuario puede elegir "Guardar como PDF" 
-        // para obtener una captura fiel de la aplicación.
+        // Opción 1: Disparar el diálogo de impresión (Funciona en todos los navegadores móviles)
         window.print();
     }
 
