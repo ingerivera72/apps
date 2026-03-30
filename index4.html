@@ -19,9 +19,9 @@
         /* Temas Pastel Suavizados */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
-        body.theme-green { background-color: #e6f4ea; color: #064e3b; } /* Pastel Verde */
-        body.theme-blue { background-color: #e0f2fe; color: #0c4a6e; }  /* Pastel Azul */
-        body.theme-pink { background-color: #fce7f3; color: #831843; }  /* Pastel Rosa */
+        body.theme-green { background-color: #e6f4ea; color: #064e3b; }
+        body.theme-blue { background-color: #e0f2fe; color: #0c4a6e; }
+        body.theme-pink { background-color: #fce7f3; color: #831843; }
 
         .app-container {
             height: 100dvh;
@@ -30,7 +30,6 @@
             padding: env(safe-area-inset-top, 8px) 12px env(safe-area-inset-bottom, 8px);
         }
 
-        /* Bloques */
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
         .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
         .section-keypad  { height: 55%; display: flex; flex-direction: column; }
@@ -84,22 +83,34 @@
             justify-content: center;
             border: 1px solid rgba(128, 128, 128, 0.3);
             position: relative;
+            transition: all 0.15s ease-out;
         }
         
         .color-card.selected {
             outline: 2px solid #3b82f6;
             outline-offset: 1px;
             z-index: 5;
+            transform: scale(1.05);
         }
 
-        .color-val { font-size: 12px; font-weight: 900; }
+        .color-card.selected .color-val {
+            transform: scale(1.25);
+            font-weight: 900;
+        }
+
+        .color-val { 
+            font-size: 12px; 
+            font-weight: 700; 
+            transition: transform 0.15s ease-out;
+            display: inline-block;
+        }
+
         .color-card.disabled { opacity: 0 !important; pointer-events: none; }
 
         .column-title { font-size: 7px; font-weight: 900; opacity: 0.8; text-transform: uppercase; line-height: 1; height: 14px; display: flex; align-items: center; justify-content: center; }
 
         .result-text { font-size: 1.4rem; font-weight: 900; line-height: 1; }
 
-        /* Herramientas Bloque 4 */
         .status-box {
             height: 38px; border-radius: 6px; display: flex;
             align-items: center; justify-content: center; font-weight: 900;
@@ -142,19 +153,19 @@
             flex-shrink: 0;
         }
 
-        /* Valores del bloque 4 aumentados a 16px */
         .val-large {
             font-size: 16px;
             font-weight: 900;
             line-height: 1.2;
         }
+
+        .hidden-element { visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body class="theme-light">
 
 <div class="app-container">
     
-    <!-- BLOQUE 1: HEADER -->
     <div class="section-header">
         <div class="flex justify-between items-center mb-1">
             <h1 class="text-[9px] font-black uppercase italic tracking-widest">Resistor Pro Advance</h1>
@@ -174,7 +185,6 @@
         </div>
     </div>
 
-    <!-- BLOQUE 2: PANTALLA -->
     <div class="section-display">
         <div class="flex gap-1.5 h-1/2 mb-1">
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
@@ -194,32 +204,29 @@
                     <rect x="60" y="5" width="180" height="50" rx="10" fill="#d2b48c" />
                     <rect id="v-b1" x="80" y="5" width="14" height="50" fill="#5d2e0a" />
                     <rect id="v-b2" x="110" y="5" width="12" height="50" fill="#000000" />
-                    <rect id="v-b3" x="135" y="5" width="12" height="50" fill="transparent" class="hidden" />
+                    <rect id="v-b3" x="135" y="5" width="12" height="50" fill="#ffffff" />
                     <rect id="v-bm" x="160" y="5" width="12" height="50" fill="#ea580c" />
                     <rect id="v-bt" x="195" y="5" width="14" height="50" fill="#b8860b" />
-                    <rect id="v-bc" x="220" y="5" width="10" height="50" fill="transparent" class="hidden" />
+                    <rect id="v-bc" x="220" y="5" width="10" height="50" fill="#7c3aed" />
                 </svg>
             </div>
             <button onclick="resetAll()" class="px-2 h-8 bg-red-600 rounded-lg text-[9px] font-black text-white active:scale-90 shadow-lg">RESET</button>
         </div>
     </div>
 
-    <!-- BLOQUE 3: TECLADO -->
     <div class="section-keypad">
         <div class="grid grid-cols-6 gap-x-1 text-center mb-1">
             <span class="column-title">Banda 1</span>
             <span class="column-title">Banda 2</span>
-            <span id="kb-lbl-d3" class="column-title opacity-0">Banda 3</span>
+            <span id="kb-lbl-d3" class="column-title">Banda 3</span>
             <span class="column-title">Mult.</span>
             <span id="kb-lbl-tol" class="column-title">Tol.</span>
-            <span id="kb-lbl-ppm" class="column-title opacity-0">Coef.</span>
+            <span id="kb-lbl-ppm" class="column-title">Coef.</span>
         </div>
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- BLOQUE 4: HERRAMIENTAS -->
     <div class="section-toolblock">
-        <!-- Validación -->
         <div class="glass-panel p-2 flex flex-col gap-1">
             <span class="text-[9px] font-black uppercase opacity-60">Validación del multímetro</span>
             <div class="flex items-center gap-1.5">
@@ -234,7 +241,6 @@
             </div>
         </div>
 
-        <!-- Rangos y Sugerencias -->
         <div class="glass-panel p-2 flex flex-col gap-1">
             <span class="text-[9px] font-black uppercase opacity-60">Rangos y sugerencias</span>
             <div class="grid grid-cols-3 gap-2">
@@ -300,7 +306,7 @@
                 kb.appendChild(btn);
             }
         });
-        updateUI();
+        setBands(4);
     }
 
     function selectColor(col, color) {
@@ -316,7 +322,10 @@
     function updateUI() {
         const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
+        
+        // Limpiar selecciones previas
         document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected'));
+        
         keys.forEach((key, idx) => {
             const val = selections[key];
             let colorObj;
@@ -324,6 +333,7 @@
             else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
             else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
             else colorObj = colors.find(c => c.val === val);
+
             if (colorObj) {
                 const svgRect = document.getElementById(svgIds[idx]);
                 if (svgRect) svgRect.setAttribute('fill', colorObj.hex);
@@ -351,6 +361,7 @@
         let max = nominalValue * (1 + tolPerc/100);
         document.getElementById('range-min').innerText = formatVal(min);
         document.getElementById('range-max').innerText = formatVal(max);
+        
         let log = Math.log10(nominalValue);
         let power = Math.floor(log);
         let base = nominalValue / Math.pow(10, power);
@@ -383,13 +394,29 @@
         currentBands = n;
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+n+'b').classList.add('active');
-        document.getElementById('v-b3').classList.toggle('hidden', n < 5);
-        document.getElementById('v-bt').classList.toggle('hidden', n === 3);
-        document.getElementById('v-bc').classList.toggle('hidden', n < 6);
+
+        // Actualizar visualización del Resistor (SVG)
+        document.getElementById('v-b3').style.display = (n < 5) ? 'none' : 'block';
+        document.getElementById('v-bt').style.display = (n === 3) ? 'none' : 'block';
+        document.getElementById('v-bc').style.display = (n < 6) ? 'none' : 'block';
+
+        // Actualizar visualización del teclado (Columnas y Etiquetas)
+        document.getElementById('kb-lbl-d3').classList.toggle('hidden-element', n < 5);
+        document.getElementById('kb-lbl-tol').classList.toggle('hidden-element', n === 3);
+        document.getElementById('kb-lbl-ppm').classList.toggle('hidden-element', n < 6);
+
+        for (let r = 0; r < colors.length; r++) {
+            // Ocultar botones de la Banda 3 si hay menos de 5 bandas
+            document.getElementById(`btn-col-2-${colors[r].code}`).classList.toggle('hidden-element', n < 5);
+            // Ocultar botones de Tolerancia si hay solo 3 bandas
+            document.getElementById(`btn-col-4-${colors[r].code}`).classList.toggle('hidden-element', n === 3);
+            // Ocultar botones de Coeficiente si hay menos de 6 bandas
+            document.getElementById(`btn-col-5-${colors[r].code}`).classList.toggle('hidden-element', n < 6);
+        }
+
+        // Mostrar u ocultar bloque de temperatura
         document.getElementById('box-temp').classList.toggle('hidden', n < 6);
-        document.getElementById('kb-lbl-d3').classList.toggle('opacity-0', n < 5);
-        document.getElementById('kb-lbl-tol').classList.toggle('opacity-0', n === 3);
-        document.getElementById('kb-lbl-ppm').classList.toggle('opacity-0', n < 6);
+        
         updateUI();
     }
 
