@@ -70,7 +70,7 @@
         .color-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            column-gap: 4px; 
+            column-gap: 8px; /* Aumentado para evitar encimamiento horizontal */
             row-gap: 2px;
             flex-grow: 1;
         }
@@ -91,6 +91,8 @@
             outline-offset: 1px;
             z-index: 5;
             transform: scale(1.05);
+            /* Resalte hacia adentro llamativo */
+            box-shadow: inset 0 0 0 4px rgba(59, 130, 246, 0.6);
         }
 
         .color-card.selected .color-val {
@@ -388,12 +390,19 @@
     }
 
     function clearMeter() { document.getElementById('meter-input').value = ""; validateMeter(); }
-    function resetAll() { selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 }; clearMeter(); updateUI(); }
+    
+    // Función Reset corregida para volver a valores iniciales (4 Bandas, 1k)
+    function resetAll() { 
+        selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 }; 
+        clearMeter(); 
+        setBands(4); // Regresa a la vista de 4 bandas por defecto
+    }
 
     function setBands(n) {
         currentBands = n;
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+n+'b').classList.add('active');
+        const activeBtn = document.getElementById('btn-'+n+'b');
+        if(activeBtn) activeBtn.classList.add('active');
 
         // Actualizar visualización del Resistor (SVG)
         document.getElementById('v-b3').style.display = (n < 5) ? 'none' : 'block';
@@ -406,11 +415,8 @@
         document.getElementById('kb-lbl-ppm').classList.toggle('hidden-element', n < 6);
 
         for (let r = 0; r < colors.length; r++) {
-            // Ocultar botones de la Banda 3 si hay menos de 5 bandas
             document.getElementById(`btn-col-2-${colors[r].code}`).classList.toggle('hidden-element', n < 5);
-            // Ocultar botones de Tolerancia si hay solo 3 bandas
             document.getElementById(`btn-col-4-${colors[r].code}`).classList.toggle('hidden-element', n === 3);
-            // Ocultar botones de Coeficiente si hay menos de 6 bandas
             document.getElementById(`btn-col-5-${colors[r].code}`).classList.toggle('hidden-element', n < 6);
         }
 
