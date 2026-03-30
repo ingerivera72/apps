@@ -16,12 +16,12 @@
             touch-action: none;
         }
 
-        /* Temas Atenuados */
+        /* Temas Pastel Suavizados */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
-        body.theme-green { background-color: #062c23; color: #ecfdf5; }
-        body.theme-blue { background-color: #0c2a43; color: #e0f2fe; }
-        body.theme-pink { background-color: #3d0a1d; color: #fce7f3; }
+        body.theme-green { background-color: #e6f4ea; color: #064e3b; } /* Pastel Verde */
+        body.theme-blue { background-color: #e0f2fe; color: #0c4a6e; }  /* Pastel Azul */
+        body.theme-pink { background-color: #fce7f3; color: #831843; }  /* Pastel Rosa */
 
         .app-container {
             height: 100dvh;
@@ -37,13 +37,15 @@
         .section-toolblock { height: 20%; display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
             border: 1px solid rgba(128, 128, 128, 0.2);
             border-radius: 10px;
         }
+        
+        .theme-dark .glass-panel { background: rgba(255, 255, 255, 0.05); }
 
-        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; }
+        .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
         .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); }
 
         .band-btn {
@@ -62,7 +64,7 @@
         .c-blue { background-color: #1e40af; color: white; }
         .c-violet { background-color: #7c3aed; color: white; }
         .c-gray { background-color: #64748b; color: white; }
-        .c-white { background-color: #ffffff; color: black; }
+        .c-white { background-color: #ffffff; color: black; border: 1px solid #ddd; }
         .c-gold { background-color: #b8860b; color: white; }
         .c-silver { background-color: #cbd5e1; color: black; }
 
@@ -90,15 +92,7 @@
             z-index: 5;
         }
 
-        .color-val { 
-            font-size: 12px; 
-            font-weight: 900; 
-            transition: transform 0.1s;
-        }
-        .selected .color-val {
-            transform: scale(1.4);
-        }
-        
+        .color-val { font-size: 12px; font-weight: 900; }
         .color-card.disabled { opacity: 0 !important; pointer-events: none; }
 
         .column-title { font-size: 7px; font-weight: 900; opacity: 0.8; text-transform: uppercase; line-height: 1; height: 14px; display: flex; align-items: center; justify-content: center; }
@@ -116,19 +110,19 @@
         .status-fail { background: #dc2626; color: white; }
 
         input[type="number"] {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.4);
             border: 1px solid rgba(128,128,128,0.4);
             border-radius: 6px;
             height: 38px;
-            width: 110px; /* Mas grande */
+            width: 110px;
             color: inherit;
             font-weight: 900;
             text-align: center;
-            font-size: 16px; /* Texto mas grande */
+            font-size: 16px;
         }
 
         select {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.4);
             border: 1px solid rgba(128,128,128,0.4);
             border-radius: 6px;
             height: 38px;
@@ -147,6 +141,13 @@
             font-weight: 900;
             flex-shrink: 0;
         }
+
+        /* Valores del bloque 4 aumentados a 16px */
+        .val-large {
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
     </style>
 </head>
 <body class="theme-light">
@@ -160,9 +161,9 @@
             <div class="flex gap-2 items-center">
                 <div onclick="setTheme('light')" class="theme-dot bg-white active"></div>
                 <div onclick="setTheme('dark')" class="theme-dot bg-slate-900"></div>
-                <div onclick="setTheme('green')" class="theme-dot bg-emerald-950"></div>
-                <div onclick="setTheme('blue')" class="theme-dot bg-sky-950"></div>
-                <div onclick="setTheme('pink')" class="theme-dot bg-pink-950"></div>
+                <div onclick="setTheme('green')" class="theme-dot bg-[#e6f4ea]"></div>
+                <div onclick="setTheme('blue')" class="theme-dot bg-[#e0f2fe]"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-[#fce7f3]"></div>
             </div>
         </div>
         <div class="glass-panel flex p-0.5 gap-1">
@@ -180,10 +181,10 @@
                 <span id="txt-val" class="result-text tracking-tighter">--</span>
             </div>
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
-                <span id="txt-tol" class="result-text text-emerald-500">--</span>
+                <span id="txt-tol" class="result-text text-emerald-600">--</span>
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
-                <span id="txt-temp" class="result-text text-orange-500">--</span>
+                <span id="txt-temp" class="result-text text-orange-600">--</span>
             </div>
         </div>
         <div class="h-1/2 flex items-center gap-2">
@@ -203,7 +204,7 @@
         </div>
     </div>
 
-    <!-- BLOQUE 3: TECLADO (55%) -->
+    <!-- BLOQUE 3: TECLADO -->
     <div class="section-keypad">
         <div class="grid grid-cols-6 gap-x-1 text-center mb-1">
             <span class="column-title">Banda 1</span>
@@ -216,7 +217,7 @@
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- BLOQUE 4: HERRAMIENTAS (20%) -->
+    <!-- BLOQUE 4: HERRAMIENTAS -->
     <div class="section-toolblock">
         <!-- Validación -->
         <div class="glass-panel p-2 flex flex-col gap-1">
@@ -239,15 +240,15 @@
             <div class="grid grid-cols-3 gap-2">
                 <div class="text-center">
                     <div class="text-[8px] uppercase font-bold opacity-50">Mínimo</div>
-                    <div id="range-min" class="text-[12px] font-black">--</div>
+                    <div id="range-min" class="val-large">--</div>
                 </div>
                 <div class="text-center">
                     <div class="text-[8px] uppercase font-bold opacity-50">Máximo</div>
-                    <div id="range-max" class="text-[12px] font-black">--</div>
+                    <div id="range-max" class="val-large">--</div>
                 </div>
-                <div class="text-center border-l border-white/10">
-                    <div class="text-[8px] uppercase font-bold opacity-60 text-blue-400">Valor o valores sugeridos</div>
-                    <div id="suggest-e12" class="text-[11px] font-black leading-none mt-1">--</div>
+                <div class="text-center border-l border-black/5 dark:border-white/5">
+                    <div class="text-[8px] uppercase font-bold opacity-60 text-blue-600 dark:text-blue-400">Valor o valores sugeridos</div>
+                    <div id="suggest-e12" class="val-large">--</div>
                 </div>
             </div>
         </div>
@@ -288,22 +289,12 @@
                 let displayVal = "";
                 let isUsable = false;
 
-                if (i < 3) {
-                    displayVal = c.val !== null ? c.val : "";
-                    isUsable = c.val !== null;
-                } else if (i === 3) {
-                    displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : "";
-                    isUsable = c.mult !== null;
-                } else if (i === 4) {
-                    displayVal = c.tol !== null ? c.tol + "%" : "";
-                    isUsable = c.tol !== null;
-                } else if (i === 5) {
-                    displayVal = c.ppm !== null ? c.ppm : "";
-                    isUsable = c.ppm !== null;
-                }
+                if (i < 3) { displayVal = c.val !== null ? c.val : ""; isUsable = c.val !== null; }
+                else if (i === 3) { displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : ""; isUsable = c.mult !== null; }
+                else if (i === 4) { displayVal = c.tol !== null ? c.tol + "%" : ""; isUsable = c.tol !== null; }
+                else if (i === 5) { displayVal = c.ppm !== null ? c.ppm : ""; isUsable = c.ppm !== null; }
 
                 if (!isUsable) btn.classList.add('disabled');
-                
                 btn.onclick = () => selectColor(i, c);
                 btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
                 kb.appendChild(btn);
@@ -325,9 +316,7 @@
     function updateUI() {
         const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
-        
         document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected'));
-        
         keys.forEach((key, idx) => {
             const val = selections[key];
             let colorObj;
@@ -335,7 +324,6 @@
             else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
             else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
             else colorObj = colors.find(c => c.val === val);
-
             if (colorObj) {
                 const svgRect = document.getElementById(svgIds[idx]);
                 if (svgRect) svgRect.setAttribute('fill', colorObj.hex);
@@ -343,23 +331,6 @@
                 if (btn) btn.classList.add('selected');
             }
         });
-
-        // Ocultar botones de columnas que no se usan segun el numero de bandas
-        colors.forEach(c => {
-            const b3Key = document.getElementById(`btn-col-2-${c.code}`);
-            const tolKey = document.getElementById(`btn-col-4-${c.code}`);
-            const ppmKey = document.getElementById(`btn-col-5-${c.code}`);
-            
-            if (currentBands < 5) b3Key.classList.add('disabled');
-            else if (c.val !== null) b3Key.classList.remove('disabled');
-
-            if (currentBands === 3) tolKey.classList.add('disabled');
-            else if (c.tol !== null) tolKey.classList.remove('disabled');
-
-            if (currentBands < 6) ppmKey.classList.add('disabled');
-            else if (c.ppm !== null) ppmKey.classList.remove('disabled');
-        });
-
         calculate();
     }
 
@@ -373,17 +344,13 @@
         let val = (currentBands < 5) ? (selections.b1 * 10 + selections.b2) : (selections.b1 * 100 + selections.b2 * 10 + selections.b3);
         nominalValue = val * selections.mult;
         let tolPerc = currentBands === 3 ? 20 : selections.tol;
-        
         document.getElementById('txt-val').innerText = formatVal(nominalValue);
         document.getElementById('txt-tol').innerText = "±" + tolPerc + "%";
         document.getElementById('txt-temp').innerText = selections.ppm ? selections.ppm + " ppm" : "--";
-
         let min = nominalValue * (1 - tolPerc/100);
         let max = nominalValue * (1 + tolPerc/100);
         document.getElementById('range-min').innerText = formatVal(min);
         document.getElementById('range-max').innerText = formatVal(max);
-
-        // Sugerencia E12
         let log = Math.log10(nominalValue);
         let power = Math.floor(log);
         let base = nominalValue / Math.pow(10, power);
@@ -395,56 +362,34 @@
         let s1 = formatVal(lower * Math.pow(10, power));
         let s2 = formatVal(upper * Math.pow(10, power));
         document.getElementById('suggest-e12').innerText = (s1 === s2) ? s1 : `${s1} / ${s2}`;
-        
         validateMeter();
     }
 
     function validateMeter() {
         const input = document.getElementById('meter-input');
         const status = document.getElementById('meter-status');
-        if (!input.value) {
-            status.className = "status-box status-off w-20";
-            status.innerText = "OFF";
-            return;
-        }
+        if (!input.value) { status.className = "status-box status-off w-20"; status.innerText = "OFF"; return; }
         let measured = parseFloat(input.value) * parseFloat(document.getElementById('meter-unit').value);
         let tolPerc = currentBands === 3 ? 20 : selections.tol;
         let diff = ((measured - nominalValue) / nominalValue) * 100;
-        if (Math.abs(diff) <= tolPerc) {
-            status.className = "status-box status-ok w-20";
-            status.innerText = `OK (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`;
-        } else {
-            status.className = "status-box status-fail w-20";
-            status.innerText = `FAIL (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`;
-        }
+        if (Math.abs(diff) <= tolPerc) { status.className = "status-box status-ok w-20"; status.innerText = `OK (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`; }
+        else { status.className = "status-box status-fail w-20"; status.innerText = `FAIL (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`; }
     }
 
-    function clearMeter() {
-        document.getElementById('meter-input').value = "";
-        validateMeter();
-    }
-
-    function resetAll() {
-        selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 };
-        clearMeter();
-        updateUI();
-    }
+    function clearMeter() { document.getElementById('meter-input').value = ""; validateMeter(); }
+    function resetAll() { selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 }; clearMeter(); updateUI(); }
 
     function setBands(n) {
         currentBands = n;
         document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-'+n+'b').classList.add('active');
-        
         document.getElementById('v-b3').classList.toggle('hidden', n < 5);
         document.getElementById('v-bt').classList.toggle('hidden', n === 3);
         document.getElementById('v-bc').classList.toggle('hidden', n < 6);
         document.getElementById('box-temp').classList.toggle('hidden', n < 6);
-        
-        // Titulos dinámicos
         document.getElementById('kb-lbl-d3').classList.toggle('opacity-0', n < 5);
         document.getElementById('kb-lbl-tol').classList.toggle('opacity-0', n === 3);
         document.getElementById('kb-lbl-ppm').classList.toggle('opacity-0', n < 6);
-        
         updateUI();
     }
 
