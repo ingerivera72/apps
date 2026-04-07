@@ -16,182 +16,261 @@
             touch-action: none;
         }
 
+        /* Temas Pastel Suavizados */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
-        body.theme-green { background-color: #064e3b; color: #ecfdf5; }
-        body.theme-blue { background-color: #bae6fd; color: #0369a1; }
-        body.theme-pink { background-color: #fce7f3; color: #9d174d; }
+        body.theme-green { background-color: #e6f4ea; color: #064e3b; }
+        body.theme-blue { background-color: #e0f2fe; color: #0c4a6e; }
+        body.theme-pink { background-color: #fce7f3; color: #831843; }
 
         .app-container {
             height: 100dvh;
             display: flex;
             flex-direction: column;
             padding: env(safe-area-inset-top, 8px) 12px env(safe-area-inset-bottom, 8px);
-            justify-content: space-between;
         }
 
         .section-header  { height: 10%; display: flex; flex-direction: column; justify-content: center; }
         .section-display { height: 15%; display: flex; flex-direction: column; justify-content: center; }
         .section-keypad  { height: 55%; display: flex; flex-direction: column; }
-        .section-footer  { height: 20%; display: flex; flex-direction: column; justify-content: center; }
+        .section-toolblock { height: 20%; display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
 
         .glass-panel {
-            background: rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(128, 128, 128, 0.1);
-            border-radius: 12px;
-            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            border-radius: 10px;
         }
+        
+        .theme-dark .glass-panel { background: rgba(255, 255, 255, 0.05); }
 
         .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; }
-        .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+        .theme-dot.active { border-color: #3b82f6; transform: scale(1.1); }
 
         .band-btn {
-            flex: 1; padding: 4px 0; font-size: 11px; font-weight: 900; border-radius: 8px;
+            flex: 1; padding: 4px 0; font-size: 10px; font-weight: 900; border-radius: 6px;
             transition: all 0.2s; color: inherit; opacity: 0.5;
         }
         .band-btn.active { background: #3b82f6; color: white; opacity: 1; }
 
+        /* Colores de las Teclas */
+        .c-black { background-color: #000000; color: white; }
+        .c-brown { background-color: #5d2e0a; color: white; }
+        .c-red { background-color: #dc2626; color: white; }
+        .c-orange { background-color: #ea580c; color: white; }
+        .c-yellow { background-color: #eab308; color: black; }
+        .c-green { background-color: #166534; color: white; }
+        .c-blue { background-color: #1e40af; color: white; }
+        .c-violet { background-color: #7c3aed; color: white; }
+        .c-gray { background-color: #64748b; color: white; }
+        .c-white { background-color: #ffffff; color: black; border: 1px solid #ddd; }
+        .c-gold { background-color: #b8860b; color: white; }
+        .c-silver { background-color: #cbd5e1; color: black; }
+
         .color-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            column-gap: 6px; 
-            row-gap: 3px;
+            column-gap: 8px; 
+            row-gap: 2px;
             flex-grow: 1;
         }
 
         .color-card {
-            height: calc(100% - 4px); 
-            min-height: 20px;
+            height: 28px; 
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            position: relative;
+            transition: all 0.15s ease-out;
         }
         
         .color-card.selected {
-            border: 3px solid #ffffff;
-            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
-            transform: scale(1.15); /* Aumentado como se solicitó */
-            z-index: 10;
+            outline: 2px solid #3b82f6;
+            outline-offset: 1px;
+            z-index: 5;
+            transform: scale(1.05);
+            box-shadow: inset 0 0 0 4px rgba(59, 130, 246, 0.6);
         }
-        
-        .color-card.disabled { opacity: 0.05; pointer-events: none; }
 
-        /* Aumento del 20% en los números de las teclas */
-        .color-val { font-size: 11px; font-weight: 900; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-
-        .c-black { background-color: #000000; color: white; }
-        .c-brown { background-color: #5d2e0a; color: white; }
-        .c-red   { background-color: #dc2626; color: white; }
-        .c-orange { background-color: #ea580c; color: white; }
-        .c-yellow { background-color: #eab308; color: black; }
-        .c-green  { background-color: #166534; color: white; }
-        .c-blue   { background-color: #1e40af; color: white; }
-        .c-violet { background-color: #7c3aed; color: white; }
-        .c-gray   { background-color: #64748b; color: white; }
-        .c-white  { background-color: #ffffff; color: black; }
-        .c-gold   { background-color: #b8860b; color: white; }
-        .c-silver { background-color: #cbd5e1; color: #1e293b; }
-
-        /* Títulos de columnas ligeramente más grandes y texto completo */
-        .column-title {
-            font-size: 9px; font-weight: 900; text-transform: uppercase;
-            opacity: 0.8; margin-bottom: 2px;
-            white-space: nowrap;
+        .color-card.selected .color-val {
+            transform: scale(1.25);
+            font-weight: 900;
         }
-        .hidden-col { visibility: hidden; pointer-events: none; }
-        
-        .result-text { font-size: 1.56rem; font-weight: 900; line-height: 1; }
 
-        @media print {
-            .section-header, .section-keypad, .section-footer, .theme-dot { display: none !important; }
-            .section-display { height: 100% !important; width: 100% !important; }
-            body { background: white !important; color: black !important; }
+        .color-val { 
+            font-size: 12px; 
+            font-weight: 700; 
+            transition: transform 0.15s ease-out;
+            display: inline-block;
         }
+
+        .color-card.disabled { opacity: 0 !important; pointer-events: none; }
+
+        .column-title { font-size: 7px; font-weight: 900; opacity: 0.8; text-transform: uppercase; line-height: 1; height: 14px; display: flex; align-items: center; justify-content: center; }
+
+        .result-text { font-size: 1.4rem; font-weight: 900; line-height: 1; }
+
+        .status-box {
+            height: 38px; border-radius: 6px; display: flex;
+            align-items: center; justify-content: center; font-weight: 900;
+            font-size: 11px; transition: all 0.3s;
+        }
+        .status-off { background: rgba(128,128,128,0.1); color: gray; }
+        .status-ok { background: #16a34a; color: white; }
+        .status-fail { background: #dc2626; color: white; }
+
+        input[type="number"] {
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(128,128,128,0.4);
+            border-radius: 6px;
+            height: 38px;
+            width: 110px;
+            color: inherit;
+            font-weight: 900;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        select {
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(128,128,128,0.4);
+            border-radius: 6px;
+            height: 38px;
+            padding: 0 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-delete {
+            background: #b91c1c; 
+            color: white;
+            padding: 0 12px; 
+            height: 38px; 
+            border-radius: 8px; 
+            font-size: 10px; 
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .val-large {
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        /* Mini-Barra Estilo */
+        #mini-preview-bar {
+            height: 12px;
+            border-radius: 4px;
+            display: flex;
+            overflow: hidden;
+            border: 1px solid rgba(128,128,128,0.4);
+            margin-top: 4px;
+        }
+        .mini-segment { flex: 1; height: 100%; border-right: 1px solid rgba(255,255,255,0.1); }
+
+        .hidden-element { visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
 </head>
 <body class="theme-light">
 
-<div class="app-container" id="capture-area">
+<div class="app-container">
     
-    <!-- ENCABEZADO -->
     <div class="section-header">
         <div class="flex justify-between items-center mb-1">
-            <h1 class="text-[10px] font-black uppercase italic tracking-wider">Resistor Pro Advance</h1>
+            <h1 class="text-[9px] font-black uppercase italic tracking-widest">Resistor Pro Advance</h1>
             <div class="flex gap-2 items-center">
                 <div onclick="setTheme('light')" class="theme-dot bg-white active"></div>
-                <div onclick="setTheme('dark')" class="theme-dot bg-slate-950"></div>
-                <div onclick="setTheme('green')" class="theme-dot bg-emerald-700"></div>
-                <div onclick="setTheme('blue')" class="theme-dot bg-sky-600"></div>
-                <div onclick="setTheme('pink')" class="theme-dot bg-pink-400"></div>
+                <div onclick="setTheme('dark')" class="theme-dot bg-slate-900"></div>
+                <div onclick="setTheme('green')" class="theme-dot bg-[#e6f4ea]"></div>
+                <div onclick="setTheme('blue')" class="theme-dot bg-[#e0f2fe]"></div>
+                <div onclick="setTheme('pink')" class="theme-dot bg-[#fce7f3]"></div>
             </div>
         </div>
         <div class="glass-panel flex p-0.5 gap-1">
-            <button onclick="setBands(3)" id="btn-3b" class="band-btn">3 BANDAS</button>
-            <button onclick="setBands(4)" id="btn-4b" class="band-btn active">4 BANDAS</button>
-            <button onclick="setBands(5)" id="btn-5b" class="band-btn">5 BANDAS</button>
-            <button onclick="setBands(6)" id="btn-6b" class="band-btn">6 BANDAS</button>
+            <button onclick="setBands(3)" id="btn-3b" class="band-btn">3B</button>
+            <button onclick="setBands(4)" id="btn-4b" class="band-btn active">4B</button>
+            <button onclick="setBands(5)" id="btn-5b" class="band-btn">5B</button>
+            <button onclick="setBands(6)" id="btn-6b" class="band-btn">6B</button>
         </div>
     </div>
 
-    <!-- PANTALLA DE RESULTADOS -->
     <div class="section-display">
         <div class="flex gap-1.5 h-1/2 mb-1">
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
-                <span class="text-[7px] uppercase font-bold opacity-60">Valor Nominal</span>
-                <span id="txt-val" class="result-text tracking-tighter">1.0k Ω</span>
+                <span id="txt-val" class="result-text tracking-tighter">--</span>
             </div>
             <div class="glass-panel flex-1 text-center flex flex-col justify-center">
-                <span class="text-[7px] uppercase font-bold opacity-60">Tolerancia</span>
-                <span id="txt-tol" class="result-text text-emerald-500">±5%</span>
+                <span id="txt-tol" class="result-text text-emerald-600">--</span>
             </div>
             <div id="box-temp" class="glass-panel flex-1 text-center flex flex-col justify-center hidden">
-                <span class="text-[7px] uppercase font-bold opacity-60">Coef. PPM</span>
-                <span id="txt-temp" class="result-text text-orange-500">250</span>
+                <span id="txt-temp" class="result-text text-orange-600">--</span>
             </div>
         </div>
-
         <div class="h-1/2 flex items-center gap-2">
             <div class="flex-grow flex justify-center">
-                <svg viewBox="0 0 300 70" class="w-full h-10 overflow-visible">
-                    <rect x="0" y="31" width="300" height="8" fill="#94a3b8" opacity="0.4" />
-                    <rect x="50" y="5" width="200" height="60" rx="12" fill="#d2b48c" />
-                    <rect id="v-b1" x="75" y="5" width="16" height="60" fill="#5d2e0a" />
-                    <rect id="v-b2" x="105" y="5" width="14" height="60" fill="#000000" />
-                    <rect id="v-b3" x="135" y="5" width="14" height="60" fill="transparent" class="hidden" />
-                    <rect id="v-bm" x="165" y="5" width="14" height="60" fill="#ea580c" />
-                    <rect id="v-bt" x="200" y="5" width="16" height="60" fill="#b8860b" />
-                    <rect id="v-bc" x="230" y="5" width="12" height="60" fill="transparent" class="hidden" />
+                <svg id="resistor-svg" viewBox="0 0 300 60" class="w-full h-8">
+                    <rect x="0" y="27" width="300" height="6" fill="#94a3b8" opacity="0.4" />
+                    <rect x="60" y="5" width="180" height="50" rx="10" fill="#d2b48c" />
+                    <rect id="v-b1" x="80" y="5" width="14" height="50" fill="#5d2e0a" />
+                    <rect id="v-b2" x="110" y="5" width="12" height="50" fill="#000000" />
+                    <rect id="v-b3" x="135" y="5" width="12" height="50" fill="#ffffff" />
+                    <rect id="v-bm" x="160" y="5" width="12" height="50" fill="#ea580c" />
+                    <rect id="v-bt" x="195" y="5" width="14" height="50" fill="#b8860b" />
+                    <rect id="v-bc" x="220" y="5" width="10" height="50" fill="#7c3aed" />
                 </svg>
             </div>
-            <!-- Botón RESET Rojo y más grande -->
-            <button onclick="location.reload()" class="px-3 h-11 bg-red-600 rounded-lg flex items-center justify-center text-[10px] font-black text-white active:scale-90 shadow-lg border border-red-400 flex-shrink-0">
-                RESET
-            </button>
+            <button onclick="resetAll()" class="px-2 h-8 bg-red-600 rounded-lg text-[9px] font-black text-white active:scale-90 shadow-lg">RESET</button>
         </div>
     </div>
 
-    <!-- TECLADO DE COLORES -->
     <div class="section-keypad">
-        <div class="grid grid-cols-6 gap-x-1.5 text-center">
-            <span class="column-title">BANDA 1</span>
-            <span class="column-title">BANDA 2</span>
-            <span id="kb-lbl-d3" class="column-title hidden-col">BANDA 3</span>
-            <span class="column-title">MULT.</span>
-            <span id="kb-lbl-tol" class="column-title">TOLER.</span>
-            <span id="kb-lbl-ppm" class="column-title hidden-col">PPM</span>
+        <div class="grid grid-cols-6 gap-x-1 text-center mb-1">
+            <span class="column-title">Banda 1</span>
+            <span class="column-title">Banda 2</span>
+            <span id="kb-lbl-d3" class="column-title">Banda 3</span>
+            <span class="column-title">Mult.</span>
+            <span id="kb-lbl-tol" class="column-title">Tol.</span>
+            <span id="kb-lbl-ppm" class="column-title">Coef.</span>
         </div>
         <div id="keyboard" class="color-grid"></div>
     </div>
 
-    <!-- ACCIONES FINALES -->
-    <div class="section-footer">
-        <button onclick="captureScreen()" class="w-full bg-blue-600 h-14 rounded-2xl font-black text-[14px] text-white shadow-xl active:scale-95 uppercase tracking-widest">
-            Guardar Captura
-        </button>
+    <div class="section-toolblock">
+        <div class="glass-panel p-2 flex flex-col gap-1">
+            <span class="text-[9px] font-black uppercase opacity-60">Ingreso de valor / Validación</span>
+            <div class="flex items-center gap-1.5">
+                <input type="number" id="meter-input" placeholder="0.00" oninput="handleMeterInput()">
+                <select id="meter-unit" onchange="handleMeterInput()">
+                    <option value="1">Ω</option>
+                    <option value="1000">KΩ</option>
+                    <option value="1000000">MΩ</option>
+                </select>
+                <div id="meter-status" class="status-box status-off w-20">OFF</div>
+                <button onclick="clearMeter()" class="btn-delete">BORRAR</button>
+            </div>
+            <div id="mini-preview-bar"></div>
+        </div>
+
+        <div class="glass-panel p-2 flex flex-col gap-1">
+            <span class="text-[9px] font-black uppercase opacity-60">Rangos y sugerencias</span>
+            <div class="grid grid-cols-3 gap-2">
+                <div class="text-center">
+                    <div class="text-[8px] uppercase font-bold opacity-50">Mínimo</div>
+                    <div id="range-min" class="val-large">--</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-[8px] uppercase font-bold opacity-50">Máximo</div>
+                    <div id="range-max" class="val-large">--</div>
+                </div>
+                <div class="text-center border-l border-black/5 dark:border-white/5">
+                    <div class="text-[8px] uppercase font-bold opacity-60 text-blue-600 dark:text-blue-400">Valor o valores sugeridos</div>
+                    <div id="suggest-e12" class="val-large">--</div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -212,10 +291,11 @@
         { code: 'c-silver', hex: '#cbd5e1', val: null, mult: 0.01, tol: 10, ppm: null }
     ];
 
+    const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+
     let currentBands = 4;
-    let visited5 = false;
-    let visited6 = false;
     let selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 };
+    let nominalValue = 1000;
 
     function initKeyboard() {
         const kb = document.getElementById('keyboard');
@@ -225,20 +305,21 @@
                 const btn = document.createElement('div');
                 btn.id = `btn-col-${i}-${c.code}`;
                 btn.className = `color-card ${c.code}`;
-                
                 let displayVal = "";
-                if (i < 3) displayVal = c.val !== null ? c.val : "";
-                else if (i === 3) displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : "";
-                else if (i === 4) displayVal = c.tol !== null ? c.tol + "%" : "";
-                else if (i === 5) displayVal = c.ppm !== null ? c.ppm : "";
+                let isUsable = false;
 
-                btn.onclick = (e) => selectColor(i, c);
+                if (i < 3) { displayVal = c.val !== null ? c.val : ""; isUsable = c.val !== null; }
+                else if (i === 3) { displayVal = c.mult !== null ? (c.mult < 1 ? c.mult : (c.mult >= 1000000 ? (c.mult/1000000)+"M" : (c.mult >= 1000 ? (c.mult/1000)+"k" : "x"+c.mult))) : ""; isUsable = c.mult !== null; }
+                else if (i === 4) { displayVal = c.tol !== null ? c.tol + "%" : ""; isUsable = c.tol !== null; }
+                else if (i === 5) { displayVal = c.ppm !== null ? c.ppm : ""; isUsable = c.ppm !== null; }
+
+                if (!isUsable) btn.classList.add('disabled');
+                btn.onclick = () => selectColor(i, c);
                 btn.innerHTML = `<span class="color-val">${displayVal}</span>`;
                 kb.appendChild(btn);
             }
         });
-        updateVisuals();
-        updateUI();
+        setBands(4);
     }
 
     function selectColor(col, color) {
@@ -247,16 +328,14 @@
         if (col === 3 && color.mult === null) return;
         if (col === 4 && color.tol === null) return;
         if (col === 5 && color.ppm === null) return;
-
         selections[keys[col]] = (col === 3) ? color.mult : (col === 4 ? color.tol : (col === 5 ? color.ppm : color.val));
-        updateVisuals();
         updateUI();
     }
 
-    function updateVisuals() {
+    function updateUI() {
         const svgIds = ['v-b1', 'v-b2', 'v-b3', 'v-bm', 'v-bt', 'v-bc'];
         const keys = ['b1', 'b2', 'b3', 'mult', 'tol', 'ppm'];
-        
+        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected'));
         keys.forEach((key, idx) => {
             const val = selections[key];
             let colorObj;
@@ -264,84 +343,164 @@
             else if (key === 'tol') colorObj = colors.find(c => c.tol === val);
             else if (key === 'ppm') colorObj = colors.find(c => c.ppm === val);
             else colorObj = colors.find(c => c.val === val);
-            
             if (colorObj) {
-                document.getElementById(svgIds[idx]).setAttribute('fill', colorObj.hex);
+                const svgRect = document.getElementById(svgIds[idx]);
+                if (svgRect) svgRect.setAttribute('fill', colorObj.hex);
+                const btn = document.getElementById(`btn-col-${idx}-${colorObj.code}`);
+                if (btn) btn.classList.add('selected');
             }
-        });
-    }
-
-    function updateUI() {
-        document.querySelectorAll('.color-card').forEach(el => el.classList.remove('selected', 'disabled'));
-        colors.forEach(c => {
-            if (selections.b1 === c.val) document.getElementById(`btn-col-0-${c.code}`).classList.add('selected');
-            if (selections.b2 === c.val) document.getElementById(`btn-col-1-${c.code}`).classList.add('selected');
-            if (selections.b3 === c.val) document.getElementById(`btn-col-2-${c.code}`).classList.add('selected');
-            if (selections.mult === c.mult) document.getElementById(`btn-col-3-${c.code}`).classList.add('selected');
-            if (selections.tol === c.tol) document.getElementById(`btn-col-4-${c.code}`).classList.add('selected');
-            if (selections.ppm === c.ppm && c.ppm !== null) document.getElementById(`btn-col-5-${c.code}`).classList.add('selected');
-            
-            if (currentBands < 5) document.getElementById(`btn-col-2-${c.code}`).classList.add('disabled');
-            if (currentBands === 3) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
-            if (currentBands < 6) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
-            
-            if (c.val === null) [0,1,2].forEach(i => document.getElementById(`btn-col-${i}-${c.code}`).classList.add('disabled'));
-            if (c.mult === null) document.getElementById(`btn-col-3-${c.code}`).classList.add('disabled');
-            if (c.tol === null) document.getElementById(`btn-col-4-${c.code}`).classList.add('disabled');
-            if (c.ppm === null) document.getElementById(`btn-col-5-${c.code}`).classList.add('disabled');
         });
         calculate();
     }
 
+    function formatVal(v) {
+        if (v >= 1000000) return (v/1000000).toFixed(2).replace(/\.00$/, '') + " MΩ";
+        if (v >= 1000) return (v/1000).toFixed(2).replace(/\.00$/, '') + " kΩ";
+        return v.toFixed(2).replace(/\.00$/, '') + " Ω";
+    }
+
     function calculate() {
         let val = (currentBands < 5) ? (selections.b1 * 10 + selections.b2) : (selections.b1 * 100 + selections.b2 * 10 + selections.b3);
-        let total = val * selections.mult;
-        let label = total >= 1000000 ? (total/1000000).toFixed(total % 1000000 === 0 ? 0 : 2) + "M" : 
-                    (total >= 1000 ? (total/1000).toFixed(total % 1000 === 0 ? 0 : 2) + "k" : total.toFixed(total % 1 === 0 ? 0 : 2));
-        document.getElementById('txt-val').innerText = label + " Ω";
-        document.getElementById('txt-tol').innerText = currentBands === 3 ? "±20%" : "±" + selections.tol + "%";
-        document.getElementById('txt-temp').innerText = selections.ppm || "--";
+        nominalValue = val * selections.mult;
+        let tolPerc = currentBands === 3 ? 20 : selections.tol;
+        document.getElementById('txt-val').innerText = formatVal(nominalValue);
+        document.getElementById('txt-tol').innerText = "±" + tolPerc + "%";
+        document.getElementById('txt-temp').innerText = selections.ppm ? selections.ppm + " ppm" : "--";
+        let min = nominalValue * (1 - tolPerc/100);
+        let max = nominalValue * (1 + tolPerc/100);
+        document.getElementById('range-min').innerText = formatVal(min);
+        document.getElementById('range-max').innerText = formatVal(max);
+        
+        let log = Math.log10(nominalValue);
+        let power = Math.floor(log);
+        let base = nominalValue / Math.pow(10, power);
+        let lower = E12[0], upper = E12[E12.length-1];
+        for(let i=0; i<E12.length; i++){
+            if(E12[i] <= base) lower = E12[i];
+            if(E12[i] >= base) { upper = E12[i]; break; }
+        }
+        let s1 = formatVal(lower * Math.pow(10, power));
+        let s2 = formatVal(upper * Math.pow(10, power));
+        document.getElementById('suggest-e12').innerText = (s1 === s2) ? s1 : `${s1} / ${s2}`;
+        validateMeter();
+    }
+
+    // Nueva función unificada para entrada de multímetro y minibarra
+    function handleMeterInput() {
+        validateMeter();
+        updateMiniPreview();
+    }
+
+    function updateMiniPreview() {
+        const input = document.getElementById('meter-input');
+        const bar = document.getElementById('mini-preview-bar');
+        bar.innerHTML = "";
+        if (!input.value || input.value <= 0) return;
+
+        let val = parseFloat(input.value) * parseFloat(document.getElementById('meter-unit').value);
+        let str = val.toString();
+        
+        // Lógica de colores para la barra
+        let exp = Math.floor(Math.log10(val));
+        let mantissa = val / Math.pow(10, exp);
+        
+        // Ajustar mantisa según el número de bandas
+        let digits = [];
+        let multiplier;
+
+        if (currentBands < 5) { // 3 y 4 bandas: 2 dígitos significativos
+            let val2 = Math.round(mantissa * 10) / 10;
+            if (val2 >= 10) { val2 /= 10; exp++; }
+            digits = [Math.floor(val2), Math.round((val2 % 1) * 10)];
+            multiplier = Math.pow(10, exp - 1);
+        } else { // 5 y 6 bandas: 3 dígitos significativos
+            let val3 = Math.round(mantissa * 100) / 100;
+            if (val3 >= 10) { val3 /= 10; exp++; }
+            digits = [Math.floor(val3), Math.floor((val3 * 10) % 10), Math.round((val3 * 100) % 10)];
+            multiplier = Math.pow(10, exp - 2);
+        }
+
+        // Crear los colores
+        let previewColors = [];
+        digits.forEach(d => previewColors.push(colors.find(c => c.val === d).hex));
+        
+        let multObj = colors.find(c => c.mult === multiplier);
+        if (multObj) previewColors.push(multObj.hex);
+
+        // Tolerancia
+        if (currentBands >= 4) {
+            let tolObj = colors.find(c => c.tol === selections.tol) || colors.find(c => c.code === 'c-gold');
+            previewColors.push(tolObj.hex);
+        }
+
+        // Coeficiente
+        if (currentBands === 6) {
+            let ppmObj = colors.find(c => c.ppm === selections.ppm) || colors.find(c => c.code === 'c-brown');
+            previewColors.push(ppmObj.hex);
+        }
+
+        // Dibujar segmentos
+        previewColors.forEach(hex => {
+            let seg = document.createElement('div');
+            seg.className = "mini-segment";
+            seg.style.backgroundColor = hex;
+            bar.appendChild(seg);
+        });
+    }
+
+    function validateMeter() {
+        const input = document.getElementById('meter-input');
+        const status = document.getElementById('meter-status');
+        if (!input.value) { status.className = "status-box status-off w-20"; status.innerText = "OFF"; return; }
+        let measured = parseFloat(input.value) * parseFloat(document.getElementById('meter-unit').value);
+        let tolPerc = currentBands === 3 ? 20 : selections.tol;
+        let diff = ((measured - nominalValue) / nominalValue) * 100;
+        if (Math.abs(diff) <= tolPerc) { status.className = "status-box status-ok w-20"; status.innerText = `OK (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`; }
+        else { status.className = "status-box status-fail w-20"; status.innerText = `FAIL (${diff > 0 ? '+':''}${diff.toFixed(1)}%)`; }
+    }
+
+    function clearMeter() { 
+        document.getElementById('meter-input').value = ""; 
+        document.getElementById('mini-preview-bar').innerHTML = "";
+        validateMeter(); 
+    }
+    
+    function resetAll() { 
+        selections = { b1: 1, b2: 0, b3: 0, mult: 100, tol: 5, ppm: 250 }; 
+        clearMeter(); 
+        setBands(4); 
+    }
+
+    function setBands(n) {
+        currentBands = n;
+        document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById('btn-'+n+'b');
+        if(activeBtn) activeBtn.classList.add('active');
+
+        document.getElementById('v-b3').style.display = (n < 5) ? 'none' : 'block';
+        document.getElementById('v-bt').style.display = (n === 3) ? 'none' : 'block';
+        document.getElementById('v-bc').style.display = (n < 6) ? 'none' : 'block';
+
+        document.getElementById('kb-lbl-d3').classList.toggle('hidden-element', n < 5);
+        document.getElementById('kb-lbl-tol').classList.toggle('hidden-element', n === 3);
+        document.getElementById('kb-lbl-ppm').classList.toggle('hidden-element', n < 6);
+
+        for (let r = 0; r < colors.length; r++) {
+            document.getElementById(`btn-col-2-${colors[r].code}`).classList.toggle('hidden-element', n < 5);
+            document.getElementById(`btn-col-4-${colors[r].code}`).classList.toggle('hidden-element', n === 3);
+            document.getElementById(`btn-col-5-${colors[r].code}`).classList.toggle('hidden-element', n < 6);
+        }
+
+        document.getElementById('box-temp').classList.toggle('hidden', n < 6);
+        
+        updateUI();
+        updateMiniPreview();
     }
 
     function setTheme(t) { 
         document.body.className = 'theme-' + t;
         document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
         event.currentTarget.classList.add('active');
-    }
-
-    function setBands(n) {
-        currentBands = n;
-        
-        if (n >= 5 && !visited5) {
-            selections.b3 = 0;
-            visited5 = true;
-        }
-        
-        if (n === 6 && !visited6) {
-            selections.ppm = 250; // Ajustado a Negro como primera opción
-            visited6 = true;
-        }
-
-        document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+n+'b').classList.add('active');
-        
-        document.getElementById('v-b3').classList.toggle('hidden', n < 5);
-        document.getElementById('v-bt').classList.toggle('hidden', n === 3);
-        document.getElementById('v-bc').classList.toggle('hidden', n < 6);
-        document.getElementById('box-temp').classList.toggle('hidden', n < 6);
-        
-        document.getElementById('kb-lbl-d3').classList.toggle('hidden-col', n < 5);
-        document.getElementById('kb-lbl-tol').classList.toggle('hidden-col', n === 3);
-        document.getElementById('kb-lbl-ppm').classList.toggle('hidden-col', n < 6);
-        
-        updateVisuals();
-        updateUI();
-    }
-
-    function captureScreen() {
-        // Al ejecutar el comando de impresión, el usuario puede elegir "Guardar como PDF" 
-        // para obtener una captura fiel de la aplicación.
-        window.print();
     }
 
     window.onload = initKeyboard;
