@@ -16,7 +16,7 @@
             touch-action: none;
         }
 
-        /* Temas Pastel Suavizados */
+        /* Temas */
         body.theme-light { background-color: #f8fafc; color: #0f172a; }
         body.theme-dark { background-color: #020617; color: #f1f5f9; }
         body.theme-green { background-color: #e6f4ea; color: #064e3b; }
@@ -83,31 +83,18 @@
             justify-content: center;
             border: 1px solid rgba(128, 128, 128, 0.3);
             position: relative;
-            transition: all 0.15s ease-out;
+            transition: all 0.1s ease-out;
         }
         
         .color-card.selected {
             outline: 2px solid #3b82f6;
             outline-offset: 1px;
             z-index: 5;
-            transform: scale(1.05);
-            box-shadow: inset 0 0 0 4px rgba(59, 130, 246, 0.6);
+            box-shadow: inset 0 0 0 4px rgba(59, 130, 246, 0.4);
         }
 
-        .color-card.selected .color-val {
-            transform: scale(1.25);
-            font-weight: 900;
-        }
-
-        .color-val { 
-            font-size: 12px; 
-            font-weight: 700; 
-            transition: transform 0.15s ease-out;
-            display: inline-block;
-        }
-
+        .color-val { font-size: 12px; font-weight: 700; }
         .color-card.disabled { opacity: 0 !important; pointer-events: none; }
-
         .column-title { font-size: 7px; font-weight: 900; opacity: 0.8; text-transform: uppercase; line-height: 1; height: 14px; display: flex; align-items: center; justify-content: center; }
 
         .result-text { font-size: 1.4rem; font-weight: 900; line-height: 1; }
@@ -151,25 +138,28 @@
             border-radius: 8px; 
             font-size: 10px; 
             font-weight: 900;
-            flex-shrink: 0;
         }
 
-        .val-large {
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 1.2;
-        }
+        .val-large { font-size: 16px; font-weight: 900; line-height: 1.2; }
 
-        /* Mini-Barra Estilo */
+        /* Mini-Barra Estilo con Franjas Separadas */
         #mini-preview-bar {
-            height: 12px;
+            height: 14px;
             border-radius: 4px;
             display: flex;
             overflow: hidden;
-            border: 1px solid rgba(128,128,128,0.4);
+            border: 1.5px solid rgba(128,128,128,0.5);
             margin-top: 4px;
+            background: #d2b48c; /* Color beige del cuerpo */
         }
-        .mini-segment { flex: 1; height: 100%; border-right: 1px solid rgba(255,255,255,0.1); }
+        .mini-segment { 
+            flex: 1; 
+            height: 100%; 
+            border-right: 1px solid rgba(255,255,255,0.3); /* Línea blanca sutil */
+            border-left: 1px solid rgba(0,0,0,0.1);    /* Línea negra sutil */
+            box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
+        }
+        .mini-segment:last-child { border-right: none; }
 
         .hidden-element { visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
     </style>
@@ -240,7 +230,7 @@
 
     <div class="section-toolblock">
         <div class="glass-panel p-2 flex flex-col gap-1">
-            <span class="text-[9px] font-black uppercase opacity-60">Ingreso de valor / Validación</span>
+            <span class="text-[9px] font-black uppercase opacity-60">Validador de Multímetro</span>
             <div class="flex items-center gap-1.5">
                 <input type="number" id="meter-input" placeholder="0.00" oninput="handleMeterInput()">
                 <select id="meter-unit" onchange="handleMeterInput()">
@@ -251,6 +241,7 @@
                 <div id="meter-status" class="status-box status-off w-20">OFF</div>
                 <button onclick="clearMeter()" class="btn-delete">BORRAR</button>
             </div>
+            <!-- Mini-Barra con separadores -->
             <div id="mini-preview-bar"></div>
         </div>
 
@@ -266,7 +257,7 @@
                     <div id="range-max" class="val-large">--</div>
                 </div>
                 <div class="text-center border-l border-black/5 dark:border-white/5">
-                    <div class="text-[8px] uppercase font-bold opacity-60 text-blue-600 dark:text-blue-400">Valor o valores sugeridos</div>
+                    <div class="text-[8px] uppercase font-bold opacity-60 text-blue-600 dark:text-blue-400">Valor Sugerido E12</div>
                     <div id="suggest-e12" class="val-large">--</div>
                 </div>
             </div>
@@ -366,6 +357,7 @@
         document.getElementById('txt-val').innerText = formatVal(nominalValue);
         document.getElementById('txt-tol').innerText = "±" + tolPerc + "%";
         document.getElementById('txt-temp').innerText = selections.ppm ? selections.ppm + " ppm" : "--";
+        
         let min = nominalValue * (1 - tolPerc/100);
         let max = nominalValue * (1 + tolPerc/100);
         document.getElementById('range-min').innerText = formatVal(min);
@@ -385,7 +377,6 @@
         validateMeter();
     }
 
-    // Nueva función unificada para entrada de multímetro y minibarra
     function handleMeterInput() {
         validateMeter();
         updateMiniPreview();
@@ -398,48 +389,43 @@
         if (!input.value || input.value <= 0) return;
 
         let val = parseFloat(input.value) * parseFloat(document.getElementById('meter-unit').value);
-        let str = val.toString();
-        
-        // Lógica de colores para la barra
         let exp = Math.floor(Math.log10(val));
         let mantissa = val / Math.pow(10, exp);
         
-        // Ajustar mantisa según el número de bandas
+        let previewColors = [];
         let digits = [];
         let multiplier;
 
-        if (currentBands < 5) { // 3 y 4 bandas: 2 dígitos significativos
+        if (currentBands < 5) {
             let val2 = Math.round(mantissa * 10) / 10;
             if (val2 >= 10) { val2 /= 10; exp++; }
             digits = [Math.floor(val2), Math.round((val2 % 1) * 10)];
             multiplier = Math.pow(10, exp - 1);
-        } else { // 5 y 6 bandas: 3 dígitos significativos
+        } else {
             let val3 = Math.round(mantissa * 100) / 100;
             if (val3 >= 10) { val3 /= 10; exp++; }
             digits = [Math.floor(val3), Math.floor((val3 * 10) % 10), Math.round((val3 * 100) % 10)];
             multiplier = Math.pow(10, exp - 2);
         }
 
-        // Crear los colores
-        let previewColors = [];
-        digits.forEach(d => previewColors.push(colors.find(c => c.val === d).hex));
+        digits.forEach(d => {
+            let c = colors.find(col => col.val === d);
+            if (c) previewColors.push(c.hex);
+        });
         
         let multObj = colors.find(c => c.mult === multiplier);
         if (multObj) previewColors.push(multObj.hex);
 
-        // Tolerancia
         if (currentBands >= 4) {
             let tolObj = colors.find(c => c.tol === selections.tol) || colors.find(c => c.code === 'c-gold');
             previewColors.push(tolObj.hex);
         }
 
-        // Coeficiente
         if (currentBands === 6) {
             let ppmObj = colors.find(c => c.ppm === selections.ppm) || colors.find(c => c.code === 'c-brown');
             previewColors.push(ppmObj.hex);
         }
 
-        // Dibujar segmentos
         previewColors.forEach(hex => {
             let seg = document.createElement('div');
             seg.className = "mini-segment";
